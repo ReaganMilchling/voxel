@@ -8,7 +8,7 @@
 #include <iostream>
 #include <vector>
 
-#include "vendor/stb_image/stb_image.h"
+#include "libs/stb_image/stb_image.h"
 
 #include "engine/shader.h"
 #include "engine/camera.h"
