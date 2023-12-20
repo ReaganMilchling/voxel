@@ -93,7 +93,7 @@ int main()
     ourShader.setUniform1i("stone", 2);
     ourShader.Bind();
 
-    World world(3, 3);
+    World world(4, 4);
 
     // Variables to create periodic event for FPS displaying
     double prevTime = 0.0;

@@ -12,9 +12,9 @@
 
 World::World(int x, int y)
 {
-    for (int32_t i = -x; i < x; ++i) 
+    for (int32_t i = 0; i < x; ++i) 
     {
-        for (int32_t j = -y; j < y; ++j) {
+        for (int32_t j = 0; j < y; ++j) {
             m_chunks.push_back(new Chunk(i, j, this));
         }
     }
@@ -49,7 +49,7 @@ float World::getBlockInWorld(int w_x, int w_z, int x, int y, int z)
             return c->get(x, y, z);
         }
     }
-    return -1.0f;
+    return 0.0f;
 }
 
 float World::getBlockInWorld(int x, int y, int z)

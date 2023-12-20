@@ -5,6 +5,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/noise.hpp>
+#include <iostream>
+#include <ostream>
 
 #include "chunk.h"
 #include "world.h"
@@ -25,36 +27,40 @@ Chunk::Chunk(uint32_t x, uint32_t z, World* world)
     {
         for (int k = 0; k < m_horizontal_max; ++k)
         {
-            int x_coord = i + (m_horizontal_max * (int)x);
-            int z_coord = k + (m_horizontal_max * (int)z);
+            for (int y = 0; y < m_y_max; ++y)
+            {
+                float scale = 0.025f;
+                float x_coord = (i + (m_horizontal_max * x));
+                float z_coord = (k + (m_horizontal_max * z));
+                float y_coord = y;
+                float inv = 1.0f / (y);
 
-            glm::vec3 p(x_coord * 0.0225f, z_coord * 0.0225f, 0.0025f);
-            int y = (int)(glm::simplex(p) * m_y_max);
+                glm::vec3 p(x_coord * scale, y_coord * scale, z_coord * scale);
+                float value = glm::simplex(p) + inv;
+                //std::cout << value << std::endl;
 
-            if (y < 0) {
-                y *= -1;
-                y /= 4;
-            }
+                if (value >= 0.0f)
+                {
+                    if (y > m_y_max * 1.0f/3.0f) 
+                    {
+                        if (y > m_y_max * 2.0f/3.0f)
+                        {
+                            this->chunk[i][y][k] = 1.0f;
+                        }
+                        else 
+                        {
+                            this->chunk[i][y][k] = 2.0f;
+                        }
+                    }
+                    else {
+                        this->chunk[i][y][k] = 3.0f;
+                    }
+                }
+                else 
+                {
+                    this->chunk[i][y][k] = 0.0f;
+                }
 
-            if (y > m_y_max - 1)
-                y = m_y_max - 1;
-            
-            chunk[i][y][k] = 1.0f;
-            if (y - 3 > 0) {
-                for (int j = y - 3; j < y; ++j)
-                {
-                    chunk[i][j][k] = 2.0f;
-                }
-                for (int j = 0; j < y - 3; ++j)
-                {
-                    chunk[i][j][k] = 3.0f;
-                }
-            }
-            else {
-                for (int j = 0; j < y; ++j)
-                {
-                    chunk[i][j][k] = 2.0f;
-                }
             }
         }
     }
