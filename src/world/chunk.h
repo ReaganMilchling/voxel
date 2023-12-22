@@ -5,12 +5,13 @@
 #include "../engine/VertexBuffer.h"
 
 #include "block.h"
+#include <mutex>
 #include <vector>
 
 class World;
 
 const int xz = 16;
-const int y =64;
+const int y = 128;
 
 class Chunk
 {
@@ -21,11 +22,16 @@ public:
 	inline int32_t getZ() { return m_z; };
 	inline float get(int x, int y, int z) { return chunk[x][y][z]; };
 	void Render(Shader&);
+	void renderNaive(Shader& shader);
+	void gen();
 private:
 	int32_t m_x, m_z;
 	int m_horizontal_max = xz;
 	int m_y_max = y;
+	
+	std::mutex m_chunk_mutex;
 	float chunk[xz][y][xz];
+
 	bool m_changed;
 
 	VertexArray m_VA;

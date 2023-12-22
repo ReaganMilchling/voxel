@@ -13,6 +13,7 @@ Camera::Camera(glm::vec3 position, glm::vec3 up, float yaw, float pitch)
     WorldUp = up;
     Yaw = yaw;
     Pitch = pitch;
+    MovementSpeed = SPEED;
     updateCameraVectors();
 }
 
@@ -54,6 +55,18 @@ void Camera::ProcessKeyboard(Camera_Movement direction, float deltaTime)
     {
         Position += Right * velocity;
         //Position += glm::vec3(1.0f, 0.0f, 0.0f) * velocity;
+    }
+
+    if( direction == INCSPEED)
+    {
+        if (MovementSpeed == SPEED) 
+        {
+            MovementSpeed = SPEED * 3.0f;
+        }
+        else 
+        {
+            MovementSpeed = SPEED;
+        }
     }
 
 

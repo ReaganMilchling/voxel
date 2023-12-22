@@ -1,11 +1,14 @@
 #include <glad/glad.h>
 #include <glm/glm.hpp>
+#include <iostream>
+#include <thread>
 
 #include "VertexArray.h"
 
 
 VertexArray::VertexArray()
 {
+	//std::cout <<  std::this_thread::get_id() << " : " << m_RendererID << std::endl;
 	glGenVertexArrays(1, &m_RendererID);
 	//GLCall(glBindVertexArray(m_RendererID));
 }
@@ -17,6 +20,7 @@ VertexArray::~VertexArray()
 
 void VertexArray::AddBuffer(const VertexBuffer& vb, const VertexBufferLayout& layout)
 {
+	//std::cout <<  std::this_thread::get_id() << " : " << m_RendererID << std::endl;
 	Bind();
 	vb.Bind();
 	const auto& elements = layout.GetElements();

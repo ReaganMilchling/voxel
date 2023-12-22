@@ -6,7 +6,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include <iostream>
-#include <vector>
+#include <thread>
 
 #include "libs/stb_image/stb_image.h"
 
@@ -28,7 +28,7 @@ const unsigned int SCR_WIDTH = 1920;
 const unsigned int SCR_HEIGHT = 1080;
 
 // camera
-Camera camera(glm::vec3(0.0f, 20.0f, 0.0f));
+Camera camera(glm::vec3(-10.0f, 64.0f, -10.0f));
 float lastX = SCR_WIDTH / 2.0f;
 float lastY = SCR_HEIGHT / 2.0f;
 bool firstMouse = true;
@@ -50,7 +50,7 @@ int main()
 
     // glfw window creation
     // --------------------
-    GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "LearnOpenGL", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "Voxel", NULL, NULL);
     if (window == NULL)
     {
         std::cout << "Failed to create GLFW window" << std::endl;
@@ -62,6 +62,7 @@ int main()
     glfwSetCursorPosCallback(window, mouse_callback);
     glfwSetScrollCallback(window, scroll_callback);
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    glfwSwapInterval(1);
 
     // glad: load all OpenGL function pointers
     // ---------------------------------------
@@ -75,9 +76,9 @@ int main()
     // -----------------------------
     glEnable(GL_DEPTH_TEST);
 
-    // build and compile our shader zprogram
+    // build and compile our shader program
     // ------------------------------------
-    Shader ourShader("res/shaders/Basic.shader");
+    Shader baseShader("res/shaders/Basic.shader");
 
     // load, create, and Bind a texture 
     // -------------------------
@@ -85,15 +86,18 @@ int main()
     texture1.Bind(0);
     Texture texture2("res/textures/dirt.jpg");
     texture2.Bind(1);
-    Texture texture3("res/textures/stone.jpg");
+    Texture texture3("res/textures/brick.jpg");
     texture3.Bind(2);
 
-    ourShader.setUniform1i("grass", 0);
-    ourShader.setUniform1i("dirt", 1);
-    ourShader.setUniform1i("stone", 2);
-    ourShader.Bind();
+    baseShader.setUniform1i("grass", 0);
+    baseShader.setUniform1i("dirt", 1);
+    baseShader.setUniform1i("stone", 2);
+    baseShader.Bind();
 
-    World world(4, 4);
+    World world(3);
+    world.generate();
+    //std::thread t1(&World::generate, &world);
+    //std::thread t1(&World::generatechunk, &world, 1, 0);
 
     // Variables to create periodic event for FPS displaying
     double prevTime = 0.0;
@@ -136,10 +140,9 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // activate shader
-
-        ourShader.setUniform1i("grass", 0);
-        ourShader.setUniform1i("dirt", 1);
-        ourShader.setUniform1i("stone", 2);
+        baseShader.setUniform1i("grass", 0);
+        baseShader.setUniform1i("dirt", 1);
+        baseShader.setUniform1i("stone", 2);
         texture1.Bind(0);
         texture2.Bind(1);
         texture3.Bind(2);
@@ -150,9 +153,9 @@ int main()
         glm::mat4 view = camera.GetViewMatrix();
         glm::mat4 model = glm::mat4(1.0f);
         glm::mat4 mvp = projection * view * model;
-        ourShader.setUniformMatrix4fv("mvp", mvp);
+        baseShader.setUniformMatrix4fv("mvp", mvp);
 
-        world.Render(ourShader);
+        world.Render(baseShader);
         
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
@@ -182,6 +185,8 @@ void processInput(GLFWwindow* window)
         camera.ProcessKeyboard(UPWARD, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
         camera.ProcessKeyboard(DOWNWARD, deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+        camera.ProcessKeyboard(INCSPEED, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS)
     {
         GLint mode[2];

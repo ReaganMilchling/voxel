@@ -7,6 +7,7 @@
 #include <glm/gtc/noise.hpp>
 #include <iostream>
 #include <ostream>
+#include <thread>
 
 #include "chunk.h"
 #include "world.h"
@@ -21,49 +22,10 @@ Chunk::Chunk(uint32_t x, uint32_t z, World* world)
     m_world = world;
     m_changed = true;
     m_vertexCount = 0;
-
-    // terrain gen
-    for (int i = 0; i < m_horizontal_max; ++i)
-    {
-        for (int k = 0; k < m_horizontal_max; ++k)
-        {
-            for (int y = 0; y < m_y_max; ++y)
-            {
-                float scale = 0.025f;
-                float x_coord = (i + (m_horizontal_max * x));
-                float z_coord = (k + (m_horizontal_max * z));
-                float y_coord = y;
-                float inv = 1.0f / (y);
-
-                glm::vec3 p(x_coord * scale, y_coord * scale, z_coord * scale);
-                float value = glm::simplex(p) + inv;
-                //std::cout << value << std::endl;
-
-                if (value >= 0.0f)
-                {
-                    if (y > m_y_max * 1.0f/3.0f) 
-                    {
-                        if (y > m_y_max * 2.0f/3.0f)
-                        {
-                            this->chunk[i][y][k] = 1.0f;
-                        }
-                        else 
-                        {
-                            this->chunk[i][y][k] = 2.0f;
-                        }
-                    }
-                    else {
-                        this->chunk[i][y][k] = 3.0f;
-                    }
-                }
-                else 
-                {
-                    this->chunk[i][y][k] = 0.0f;
-                }
-
-            }
-        }
-    }
+    
+    //gen();
+    std::thread t1(&Chunk::gen, this);
+    t1.detach();
 }
 
 Chunk::~Chunk()
@@ -75,6 +37,10 @@ void Chunk::update()
 {
     if (m_changed)
     {
+        m_VA.Unbind();
+        m_VB.Unbind();
+
+        std::cout << "adding mesh" << std::endl;
         // recreate mesh
         for (int i = 0; i < m_horizontal_max; ++i)
         {
@@ -104,6 +70,7 @@ void Chunk::update()
         layout.Push<float>(2);
         layout.Push<float>(1);
         m_VA.AddBuffer(m_VB, layout);
+        std::cout << std::this_thread::get_id() << " :meshSize: " << m_mesh.size() << std::endl;
 
         // update changed
         m_changed = false;
@@ -112,13 +79,77 @@ void Chunk::update()
 
 void Chunk::Render(Shader &shader)
 {
+    if (this->m_chunk_mutex.try_lock())
+    {
+    
+        update();
+        //std::cout << m_mesh.size() << std::endl;
+        //std::cout << std::this_thread::get_id() << " : " << m_vertexCount << std::endl;
+
+        shader.Bind();
+        m_VB.Bind();
+        m_VA.Bind();
+
+        glDrawArrays(GL_TRIANGLES, 0, m_vertexCount);
+        this->m_chunk_mutex.unlock();
+    } 
+}
+
+void Chunk::renderNaive(Shader &shader)
+{
     update();
 
     shader.Bind();
-    m_VB.Bind();
-    m_VA.Bind();
 
-    glDrawArrays(GL_TRIANGLES, 0, m_vertexCount);
+}
+
+void Chunk::gen()
+{
+
+    this->m_chunk_mutex.lock();
+    // terrain gen
+    for (int i = 0; i < m_horizontal_max; ++i)
+    {
+        for (int k = 0; k < m_horizontal_max; ++k)
+        {
+            for (int y = 0; y < m_y_max; ++y)
+            {
+                float scale = 0.025f;
+                float x_coord = (i + (m_horizontal_max * this->m_x));
+                float z_coord = (k + (m_horizontal_max * this->m_z));
+                float y_coord = y;
+                float inv = 1.0f / (y);
+
+                glm::vec3 p(x_coord * scale, y_coord * scale, z_coord * scale);
+                float value = glm::simplex(p) + inv;
+                //std::cout << value << std::endl;
+
+                if (value >= 0.0f)
+                {
+                    if (y > m_y_max * 1.0f/2.0f) 
+                    {
+                        if (y > m_y_max * 4.0f/5.0f)
+                        {
+                            this->chunk[i][y][k] = 1.0f;
+                        }
+                        else 
+                        {
+                            this->chunk[i][y][k] = 2.0f;
+                        }
+                    }
+                    else {
+                        this->chunk[i][y][k] = 3.0f;
+                    }
+                }
+                else 
+                {
+                    this->chunk[i][y][k] = 0.0f;
+                }
+
+            }
+        }
+    }
+    this->m_chunk_mutex.unlock();
 }
 
 std::vector<std::vector<float>> Chunk::getVisibleFaces(int i, int j, int k)
