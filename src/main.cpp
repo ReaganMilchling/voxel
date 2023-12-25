@@ -28,7 +28,7 @@ const unsigned int SCR_WIDTH = 1920;
 const unsigned int SCR_HEIGHT = 1080;
 
 // camera
-Camera camera(glm::vec3(30.0f, 64.0f, -10.0f));
+Camera camera(glm::vec3(64.0f, 164.0f, 64.0f));
 float lastX = SCR_WIDTH / 2.0f;
 float lastY = SCR_HEIGHT / 2.0f;
 bool firstMouse = true;
@@ -83,7 +83,7 @@ int main()
 
     // load, create, and Bind a texture 
     // -------------------------
-    Texture texture1("res/textures/stone.png");
+    Texture texture1("res/textures/stone.jpg");
     texture1.Bind(1);
     Texture texture2("res/textures/dirt.jpg");
     texture2.Bind(2);
@@ -93,15 +93,21 @@ int main()
     texture4.Bind(4);
     Texture texture5("res/textures/snow.jpg");
     texture5.Bind(5);
+    Texture texture6("res/textures/sand.jpg");
+    texture5.Bind(6);
+    Texture texture7("res/textures/gravel.jpg");
+    texture5.Bind(7);
 
     baseShader.setUniform1i("stone", 1);
     baseShader.setUniform1i("dirt", 2);
     baseShader.setUniform1i("grass", 3);
     baseShader.setUniform1i("water", 4);
     baseShader.setUniform1i("snow", 5);
+    baseShader.setUniform1i("sand", 6);
+    baseShader.setUniform1i("gravel", 7);
     baseShader.Bind();
 
-    World world(9);
+    World world(6);
     world.generate();
     //std::thread t1(&World::generate, &world);
     //std::thread t1(&World::generatechunk, &world, 1, 0);
@@ -152,11 +158,15 @@ int main()
         baseShader.setUniform1i("grass", 3);
         baseShader.setUniform1i("water", 4);
         baseShader.setUniform1i("snow", 5);
+        baseShader.setUniform1i("sand", 6);
+        baseShader.setUniform1i("gravel", 7);
         texture1.Bind(1);
         texture2.Bind(2);
         texture3.Bind(3);
         texture4.Bind(4);
         texture5.Bind(5);
+        texture6.Bind(6);
+        texture7.Bind(7);
 
         // MVP
         //player.getcamera

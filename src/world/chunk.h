@@ -10,7 +10,7 @@
 
 class World;
 
-const int xz = 16;
+const int xz = 32;
 const int y = 128;
 
 class Chunk

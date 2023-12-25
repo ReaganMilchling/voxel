@@ -135,7 +135,16 @@ void Chunk::gen()
                 frequency *= lacunarity;
             }
 
-            int y = noiseHeight * (5.0f*this->m_y_max/16.0f) + (11.0f*this->m_y_max/16.0f);
+            noiseHeight += .41421f;
+            if (noiseHeight > 0.0f) {
+                noiseHeight *= noiseHeight;
+            } else {
+                noiseHeight *= noiseHeight;
+                noiseHeight = -noiseHeight;
+            }
+
+            //int y = noiseHeight * (this->m_y_max/4.0f);
+            int y = (int)(noiseHeight * (this->m_y_max/4.0f) + (this->m_y_max/2.0f));
 
             if (y >= m_y_max)
                 y = m_y_max - 1;
@@ -166,11 +175,17 @@ void Chunk::gen()
                 this->chunk[x][y-1][z] = 2.0f;
                 this->chunk[x][y-2][z] = 2.0f;
             }
+            else if (y == 64 || y == 63 || y == 62)
+            {
+                this->chunk[x][y][z] = 6.0f;
+                this->chunk[x][y-1][z] = 6.0f;
+                this->chunk[x][y-2][z] = 6.0f;
+            }
             else
             {
-                this->chunk[x][y][z] = 2.0f;                
-                this->chunk[x][y-1][z] = 2.0f;
-                this->chunk[x][y-2][z] = 2.0f;
+                this->chunk[x][y][z] = 7.0f;                
+                this->chunk[x][y-1][z] = 7.0f;
+                this->chunk[x][y-2][z] = 7.0f;
             }
 
             for (int i = 0; i < this->m_y_max; ++i)
@@ -183,7 +198,7 @@ void Chunk::gen()
                 }
             } 
             
-            //cavegen(x, y, z);
+            cavegen(x, y, z);
         }
     }
     this->m_chunk_mutex.unlock();
@@ -193,7 +208,7 @@ void Chunk::cavegen(int x, int y_max, int z)
 {
     // cave gen
     // to be used only by this class - should make private or synchronize properly
-    for (int y = 0; y <= y_max; ++y)
+    for (int y = 1; y <= y_max - 3; ++y)
     {
         float scale = 0.025f;
         float x_coord = (x + (m_horizontal_max * this->m_x));
@@ -202,10 +217,10 @@ void Chunk::cavegen(int x, int y_max, int z)
         float inv = 1.0f / (y);
 
         glm::vec3 p(x_coord * scale, y_coord * scale, z_coord * scale);
-        float value = glm::simplex(p) + inv;
+        float value = glm::simplex(p);
         //std::cout << value << std::endl;
 
-        if (value < 0.0f)
+        if (value < 0.1f && value > -0.1f)
         {
             this->chunk[x][y][z] = 0.0f;
         }

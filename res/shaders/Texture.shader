@@ -29,6 +29,8 @@ uniform sampler2D dirt;
 uniform sampler2D grass;
 uniform sampler2D water;
 uniform sampler2D snow;
+uniform sampler2D sand;
+uniform sampler2D gravel;
 
 void main()
 {
@@ -42,4 +44,8 @@ void main()
 		FragColor = vec4(1.0, 1.0, 1.0, 0.5) * texture(water, TexCoord);
 	else if (TexImage == 5.0f)
 		FragColor = texture(snow, TexCoord);
+	else if (TexImage == 6.0f)
+		FragColor = texture(sand, TexCoord);
+	else if (TexImage == 7.0f)
+		FragColor = texture(gravel, TexCoord);
 }
