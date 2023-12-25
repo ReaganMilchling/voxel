@@ -30,14 +30,5 @@ uniform sampler2D stone;
 
 void main()
 {
-	if (TexImage == 1.0f)
-		FragColor = vec4(0.412, 0.412, 0.412, 1.0);
-	else if (TexImage == 2.0f)
-		FragColor = vec4(0.545, 0.271, 0.075, 1.0);
-	else if (TexImage == 3.0f)
-		FragColor = vec4(0.133, 0.545, 0.133, 1.0);
-	else if (TexImage == 4.0f)
-		FragColor = vec4(0.000, 0.000, 0.804, 0.5);
-	else if (TexImage == 5.0f)
-		FragColor = vec4(1.000, 0.980, 0.980, 1.0);
+	FragColor = vec4(0.827, 0.827, 0.827, 0.75);
 }

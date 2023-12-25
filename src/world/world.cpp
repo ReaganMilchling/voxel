@@ -36,7 +36,7 @@ void World::generate()
             this->m_chunks_mutex.lock();
             this->m_chunks.push_back(togen);
             this->m_chunks_mutex.unlock();
-            std::cout << std::this_thread::get_id() << " :coords: " << i << " : " << j << std::endl;
+            //std::cout << std::this_thread::get_id() << " :coords: " << i << " : " << j << std::endl;
         }
     }
 }
@@ -45,7 +45,7 @@ void World::generatechunk(int x, int y)
 {
     Chunk *togen = new Chunk(x, y, this);
     this->m_chunks.push_back(togen);
-    std::cout << std::this_thread::get_id() << " :coords: " << x << " : " << y << std::endl;
+    //std::cout << std::this_thread::get_id() << " :coords: " << x << " : " << y << std::endl;
 }
 
 void World::Render(Shader& shader)

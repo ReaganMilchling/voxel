@@ -32,6 +32,8 @@ private:
 	std::mutex m_chunk_mutex;
 	float chunk[xz][y][xz];
 
+	void cavegen(int x, int y, int z);
+
 	bool m_changed;
 
 	VertexArray m_VA;

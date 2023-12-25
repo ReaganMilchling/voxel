@@ -26,7 +26,7 @@ Texture::Texture(const std::string& path)
     }
     else
     {
-        std::cout << "Failed to load texture" << std::endl;
+        std::cout << "Failed to load texture " << path << std::endl;
     }
     glActiveTexture(m_TextureID);
     stbi_image_free(data);

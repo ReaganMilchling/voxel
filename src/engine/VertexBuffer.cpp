@@ -9,7 +9,7 @@
 
 VertexBuffer::VertexBuffer()
 {
-	std::cout <<  std::this_thread::get_id() << " rendID: " << m_RenderedID << std::endl;
+	//std::cout <<  std::this_thread::get_id() << " rendID: " << m_RenderedID << std::endl;
 	glGenBuffers(1, &m_RenderedID);
 }
 
@@ -20,7 +20,7 @@ VertexBuffer::~VertexBuffer()
 
 void VertexBuffer::AddBufferData(const void* data, unsigned int size)
 {
-	std::cout <<  std::this_thread::get_id() << " rendID: " << m_RenderedID << std::endl;
+	//std::cout <<  std::this_thread::get_id() << " rendID: " << m_RenderedID << std::endl;
 	glBindBuffer(GL_ARRAY_BUFFER, m_RenderedID);
 	glBufferData(GL_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);
 }

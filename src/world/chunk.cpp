@@ -40,7 +40,7 @@ void Chunk::update()
         m_VA.Unbind();
         m_VB.Unbind();
 
-        std::cout << "adding mesh" << std::endl;
+        //std::cout << "adding mesh" << std::endl;
         // recreate mesh
         for (int i = 0; i < m_horizontal_max; ++i)
         {
@@ -70,7 +70,7 @@ void Chunk::update()
         layout.Push<float>(2);
         layout.Push<float>(1);
         m_VA.AddBuffer(m_VB, layout);
-        std::cout << std::this_thread::get_id() << " :meshSize: " << m_mesh.size() << std::endl;
+        //std::cout << std::this_thread::get_id() << " :meshSize: " << m_mesh.size() << std::endl;
 
         // update changed
         m_changed = false;
@@ -81,7 +81,8 @@ void Chunk::Render(Shader &shader)
 {
     if (this->m_chunk_mutex.try_lock())
     {
-    
+        if (this->m_mesh.size() == 0) 
+            this->m_changed = true;
         update();
         //std::cout << m_mesh.size() << std::endl;
         //std::cout << std::this_thread::get_id() << " : " << m_vertexCount << std::endl;
@@ -105,51 +106,112 @@ void Chunk::renderNaive(Shader &shader)
 
 void Chunk::gen()
 {
+    float scale = 50.0f;
+    float persistence = 0.4f;
+    float lacunarity = 1.5f;
+    int octaves = 8;
 
     this->m_chunk_mutex.lock();
-    // terrain gen
-    for (int i = 0; i < m_horizontal_max; ++i)
+    // ground generation
+    for (int x = 0; x < m_horizontal_max; ++x)
     {
-        for (int k = 0; k < m_horizontal_max; ++k)
+        for (int z = 0; z < m_horizontal_max; ++z)
         {
-            for (int y = 0; y < m_y_max; ++y)
+            float amplitude = 1.1f;
+            float frequency = 1.5f;
+            float noiseHeight = 0.0f;
+
+            for (int i = 0; i < octaves; ++i)
             {
-                float scale = 0.025f;
-                float x_coord = (i + (m_horizontal_max * this->m_x));
-                float z_coord = (k + (m_horizontal_max * this->m_z));
-                float y_coord = y;
-                float inv = 1.0f / (y);
+                float x_coord = (x + (m_horizontal_max * this->m_x)) / scale * frequency;
+                float z_coord = (z + (m_horizontal_max * this->m_z)) / scale * frequency;
+                
+                glm::vec2 coord(x_coord, z_coord);
+                float perlinValue = glm::perlin(coord);
+                //std::cout << x_coord << ":" << z_coord << " - "  << coord.x << ":" << coord.y << " - " << perlinValue << std::endl;
+                noiseHeight += perlinValue * amplitude;
 
-                glm::vec3 p(x_coord * scale, y_coord * scale, z_coord * scale);
-                float value = glm::simplex(p) + inv;
-                //std::cout << value << std::endl;
-
-                if (value >= 0.0f)
-                {
-                    if (y > m_y_max * 1.0f/2.0f) 
-                    {
-                        if (y > m_y_max * 4.0f/5.0f)
-                        {
-                            this->chunk[i][y][k] = 1.0f;
-                        }
-                        else 
-                        {
-                            this->chunk[i][y][k] = 2.0f;
-                        }
-                    }
-                    else {
-                        this->chunk[i][y][k] = 3.0f;
-                    }
-                }
-                else 
-                {
-                    this->chunk[i][y][k] = 0.0f;
-                }
-
+                amplitude *= persistence;
+                frequency *= lacunarity;
             }
+
+            int y = noiseHeight * (5.0f*this->m_y_max/16.0f) + (11.0f*this->m_y_max/16.0f);
+
+            if (y >= m_y_max)
+                y = m_y_max - 1;
+            if (y < 0)
+                y = 0;
+
+            if (y > m_y_max * 15.0f/16.0f)
+            {
+                this->chunk[x][y][z] = 5.0f;
+                this->chunk[x][y-1][z] = 5.0f;
+                this->chunk[x][y-2][z] = 5.0f;
+            }
+            else if (y > m_y_max * 14.0f/16.0f)
+            {
+                this->chunk[x][y][z] = 1.0f;
+                this->chunk[x][y-1][z] = 1.0f;
+                this->chunk[x][y-2][z] = 1.0f;
+            }
+            else if (y > m_y_max * 13.0f/16.0f)
+            {
+                this->chunk[x][y][z] = 2.0f;
+                this->chunk[x][y-1][z] = 2.0f;
+                this->chunk[x][y-2][z] = 2.0f;
+            }
+            else if (y > m_y_max * 8.0f/16.0f)
+            {
+                this->chunk[x][y][z] = 3.0f;
+                this->chunk[x][y-1][z] = 2.0f;
+                this->chunk[x][y-2][z] = 2.0f;
+            }
+            else
+            {
+                this->chunk[x][y][z] = 2.0f;                
+                this->chunk[x][y-1][z] = 2.0f;
+                this->chunk[x][y-2][z] = 2.0f;
+            }
+
+            for (int i = 0; i < this->m_y_max; ++i)
+            {
+                if (i > y) {
+                    this->chunk[x][i][z] = 0.0f;
+                }
+                if (i < y - 2) {
+                    this->chunk[x][i][z] = 1.0f;
+                }
+            } 
+            
+            //cavegen(x, y, z);
         }
     }
     this->m_chunk_mutex.unlock();
+}
+
+void Chunk::cavegen(int x, int y_max, int z)
+{
+    // cave gen
+    // to be used only by this class - should make private or synchronize properly
+    for (int y = 0; y <= y_max; ++y)
+    {
+        float scale = 0.025f;
+        float x_coord = (x + (m_horizontal_max * this->m_x));
+        float z_coord = (z + (m_horizontal_max * this->m_z));
+        float y_coord = y;
+        float inv = 1.0f / (y);
+
+        glm::vec3 p(x_coord * scale, y_coord * scale, z_coord * scale);
+        float value = glm::simplex(p) + inv;
+        //std::cout << value << std::endl;
+
+        if (value < 0.0f)
+        {
+            this->chunk[x][y][z] = 0.0f;
+        }
+
+    }
+
 }
 
 std::vector<std::vector<float>> Chunk::getVisibleFaces(int i, int j, int k)
