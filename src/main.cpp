@@ -76,10 +76,14 @@ int main()
     // -----------------------------
     glEnable(GL_DEPTH_TEST);
     //glDepthFunc(GL_ALWAYS);
+    glEnable(GL_BLEND); //Enable blending.
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); //Set blending function.
+    glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
 
     // build and compile our shader program
     // ------------------------------------
-    Shader baseShader("res/shaders/Texture.shader");
+    Shader textureShader("res/shaders/Texture.shader");
+    Shader rgbShader("res/shaders/Basic.shader");
 
     // load, create, and Bind a texture 
     // -------------------------
@@ -89,7 +93,7 @@ int main()
     texture2.Bind(2);
     Texture texture3("res/textures/grass.jpg");
     texture3.Bind(3);
-    Texture texture4("res/textures/dirt.jpg");
+    Texture texture4("res/textures/water.jpg");
     texture4.Bind(4);
     Texture texture5("res/textures/snow.jpg");
     texture5.Bind(5);
@@ -98,16 +102,17 @@ int main()
     Texture texture7("res/textures/gravel.jpg");
     texture5.Bind(7);
 
-    baseShader.setUniform1i("stone", 1);
-    baseShader.setUniform1i("dirt", 2);
-    baseShader.setUniform1i("grass", 3);
-    baseShader.setUniform1i("water", 4);
-    baseShader.setUniform1i("snow", 5);
-    baseShader.setUniform1i("sand", 6);
-    baseShader.setUniform1i("gravel", 7);
-    baseShader.Bind();
+    textureShader.setUniform1i("stone", 1);
+    textureShader.setUniform1i("dirt", 2);
+    textureShader.setUniform1i("grass", 3);
+    textureShader.setUniform1i("water", 4);
+    textureShader.setUniform1i("snow", 5);
+    textureShader.setUniform1i("sand", 6);
+    textureShader.setUniform1i("gravel", 7);
+    textureShader.Bind();
+    rgbShader.Bind();
 
-    World world(6);
+    World world(5);
     world.generate();
     //std::thread t1(&World::generate, &world);
     //std::thread t1(&World::generatechunk, &world, 1, 0);
@@ -153,13 +158,13 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // activate shader
-        baseShader.setUniform1i("stone", 1);
-        baseShader.setUniform1i("dirt", 2);
-        baseShader.setUniform1i("grass", 3);
-        baseShader.setUniform1i("water", 4);
-        baseShader.setUniform1i("snow", 5);
-        baseShader.setUniform1i("sand", 6);
-        baseShader.setUniform1i("gravel", 7);
+        textureShader.setUniform1i("stone", 1);
+        textureShader.setUniform1i("dirt", 2);
+        textureShader.setUniform1i("grass", 3);
+        textureShader.setUniform1i("water", 4);
+        textureShader.setUniform1i("snow", 5);
+        textureShader.setUniform1i("sand", 6);
+        textureShader.setUniform1i("gravel", 7);
         texture1.Bind(1);
         texture2.Bind(2);
         texture3.Bind(3);
@@ -174,10 +179,9 @@ int main()
         glm::mat4 view = camera.GetViewMatrix();
         glm::mat4 model = glm::mat4(1.0f);
         glm::mat4 mvp = projection * view * model;
-        baseShader.setUniformMatrix4fv("mvp", mvp);
+        textureShader.setUniformMatrix4fv("mvp", mvp);
 
-        glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
-        world.Render(baseShader);
+        world.Render(textureShader);
         
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)

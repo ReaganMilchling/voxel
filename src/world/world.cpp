@@ -54,7 +54,7 @@ void World::Render(Shader& shader)
     this->m_chunks_mutex.lock();
     for (unsigned int i = 0; i < this->m_chunks.size(); ++i)
     {
-        this->m_chunks.at(i)->Render(shader);
+        this->m_chunks.at(i)->render(shader);
     }
     this->m_chunks_mutex.unlock();
 }

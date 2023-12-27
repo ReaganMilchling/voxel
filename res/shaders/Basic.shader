@@ -24,9 +24,6 @@ in float TexImage;
 out vec4 FragColor;
 
 // texture samplers
-uniform sampler2D grass;
-uniform sampler2D dirt;
-uniform sampler2D stone;
 
 void main()
 {
@@ -40,4 +37,8 @@ void main()
 		FragColor = vec4(0.000, 0.000, 0.804, 0.5);
 	else if (TexImage == 5.0f)
 		FragColor = vec4(1.000, 0.980, 0.980, 1.0);
+	else if (TexImage == 6.0f)
+		FragColor = vec4(0.824, 0.706, 0.549, 1.0);
+	else if (TexImage == 7.0f)
+		FragColor = vec4(0.863, 0.863, 0.863, 1.0);
 }
