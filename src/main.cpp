@@ -8,8 +8,6 @@
 #include <iostream>
 #include <thread>
 
-#include "libs/stb_image/stb_image.h"
-
 #include "engine/shader.h"
 #include "engine/camera.h"
 #include "world/chunk.h"
@@ -112,9 +110,10 @@ int main()
     textureShader.Bind();
     rgbShader.Bind();
 
-    World world(5);
-    world.generate();
-    //std::thread t1(&World::generate, &world);
+    World world(&camera, 5);
+    //world.generate();
+    std::thread t1(&World::generate, &world);
+    //std::cout << std::this_thread::get_id() << std::endl;
     //std::thread t1(&World::generatechunk, &world, 1, 0);
 
     // Variables to create periodic event for FPS displaying
@@ -153,6 +152,8 @@ int main()
         // input
         processInput(window);
 
+        //world.update();
+
         // render
         glClearColor(0.0f, 0.6f, 0.9f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -189,6 +190,7 @@ int main()
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
+
 
     glfwTerminate(); 
     return 0;

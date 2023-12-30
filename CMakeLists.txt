@@ -4,14 +4,17 @@ set(CMAKE_CXX_STANDARD 23)
 
 file(GLOB_RECURSE voxelSource src/*.cpp src/*.h)
 add_executable(
-    voxel 
+    voxel
     ${voxelSource}
     third_party/glad/src/glad.c
+    third_party/stb_image/stb_image.cpp
+    third_party/stb_image/stb_image.h
 )
 
 add_subdirectory(third_party/glfw EXCLUDE_FROM_ALL)
 add_subdirectory(third_party/glm EXCLUDE_FROM_ALL)
 include_directories(third_party/glad/include EXCLUDE_FROM_ALL)
+include_directories(third_party/stb_image)
 include_directories(res)
 
 target_link_libraries(voxel PRIVATE glfw glm)

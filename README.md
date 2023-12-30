@@ -9,5 +9,6 @@ Setup lsp:
 
 build & play:
 - mkdir build && cd build
-- CXX=clang++ CC=clang cmake .. && make or (cmake -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang ..)
+- export CC=/usr/bin/clang && export CXX=/usr/bin/clang++
+- CXX=clang++ CC=clang cmake .. && make or (cmake -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang .. && make)
 - ./voxel

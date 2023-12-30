@@ -117,7 +117,7 @@ void Chunk::render(Shader &shader)
 
         update();
         //std::cout << m_mesh.size() << std::endl;
-        //std::cout << std::this_thread::get_id() << " : " << m_vertexCount << std::endl;
+        std::cout << std::this_thread::get_id() << " : " << m_vertex_ct << std::endl;
 
         shader.Bind();
         m_VB.Bind();

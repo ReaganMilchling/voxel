@@ -1,4 +1,4 @@
-#include "../libs/stb_image/stb_image.h"
+#include <stb_image.h>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <iostream>
