@@ -7,15 +7,17 @@
 #include <glm/gtc/noise.hpp>
 #include <iostream>
 #include <ostream>
+#include <stdexcept>
 #include <thread>
 
 #include "world.h"
 #include "chunk.h"
 
 
-World::World(Camera* camera, int s)
+World::World(Camera* camera, int s, int renderDistance)
 {
     m_size = s;
+    m_render_distance = renderDistance;
     m_camera = camera;
     m_camera_pos = &camera->Position;
     m_previous_pos = glm::vec2((int)(m_camera_pos->x/xz), (int)(m_camera_pos->z/xz));
@@ -43,7 +45,7 @@ void World::generate()
             m_loaded_chunk_map[pair] = togen;
             m_viewable_chunk_map[pair] = togen;
             m_chunks_mutex.unlock();
-            std::cout << std::this_thread::get_id() << " :coords: " << i << " : " << j << std::endl;
+            //std::cout << std::this_thread::get_id() << " :coords: " << i << " : " << j << std::endl;
         }
     }
 }
@@ -69,14 +71,22 @@ void World::Render(Shader& shader)
 
 void World::moveChunk(int x, int y)
 {
-    Chunk* chunk = m_loaded_chunk_map.at(std::pair(x, y));
-    if (chunk != nullptr)
-    {
+    std::pair p(x, y);
 
-    }
-    else 
+    try 
     {
-    
+        Chunk* chunk = m_loaded_chunk_map.at(p);
+        m_viewable_chunk_map[p] = chunk;
+    } 
+    catch (std::out_of_range) 
+    {
+        if (m_loaded_chunk_map.size() > 250) {return;}
+        Chunk *togen = new Chunk(x, y, this);
+
+        m_chunks_mutex.lock();
+        m_loaded_chunk_map[p] = togen;
+        m_viewable_chunk_map[p] = togen;
+        m_chunks_mutex.unlock();
     }
 }
 
@@ -87,15 +97,15 @@ void World::update()
     {
         //std::cout << new_pos.x << "-" << new_pos.y << std::endl;
         m_viewable_chunk_map.clear();
-        m_viewable_chunk_map[std::pair(new_pos.x, new_pos.y)] = m_loaded_chunk_map[std::pair(new_pos.x, new_pos.y)];
-        m_viewable_chunk_map[std::pair(new_pos.x, new_pos.y-1)] = m_loaded_chunk_map[std::pair(new_pos.x, new_pos.y-1)];
-        m_viewable_chunk_map[std::pair(new_pos.x, new_pos.y+1)] = m_loaded_chunk_map[std::pair(new_pos.x, new_pos.y+1)];
-        m_viewable_chunk_map[std::pair(new_pos.x-1, new_pos.y)] = m_loaded_chunk_map[std::pair(new_pos.x-1, new_pos.y)];
-        m_viewable_chunk_map[std::pair(new_pos.x-1, new_pos.y-1)] = m_loaded_chunk_map[std::pair(new_pos.x-1, new_pos.y-1)];
-        m_viewable_chunk_map[std::pair(new_pos.x-1, new_pos.y+1)] = m_loaded_chunk_map[std::pair(new_pos.x-1, new_pos.y+1)];
-        m_viewable_chunk_map[std::pair(new_pos.x+1, new_pos.y-1)] = m_loaded_chunk_map[std::pair(new_pos.x+1, new_pos.y-1)];
-        m_viewable_chunk_map[std::pair(new_pos.x+1, new_pos.y+1)] = m_loaded_chunk_map[std::pair(new_pos.x+1, new_pos.y+1)];
-        m_viewable_chunk_map[std::pair(new_pos.x+1, new_pos.y)] = m_loaded_chunk_map[std::pair(new_pos.x+1, new_pos.y)];
+        
+        int neg_dist = m_render_distance * -1;
+        for (int i = neg_dist; i <= m_render_distance; ++i)
+        {
+            for (int j = neg_dist; j <= m_render_distance; ++j)
+            {
+                this->moveChunk(new_pos.x + i, new_pos.y + j);
+            }
+        }        
         m_previous_pos = new_pos;
     }
 
@@ -103,13 +113,17 @@ void World::update()
 
 float World::getBlockInWorld(int w_x, int w_z, int x, int y, int z)
 {
-    for (Chunk* c : m_chunks) {
-        if (c->getX() == w_x && c->getZ() == w_z)
-        {
-            return c->get(x, y, z);
-        }
+    std::pair p(w_x, w_z);
+    try 
+    {
+        Chunk* chunk = m_loaded_chunk_map.at(p);
+        return chunk->get(x, y, z);
+    } 
+    catch (std::out_of_range) 
+    {
+        return -1.0f;
     }
-    return 0.0f;
+
 }
 
 float World::getBlockInWorld(int x, int y, int z)

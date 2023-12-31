@@ -37,6 +37,7 @@ private:
 	std::mutex m_chunk_mutex;
 	float chunk[xz][y][xz];
 	bool m_changed;
+	bool m_regen_mesh;
 
 	VertexArray m_VA;
 	VertexBuffer m_VB;
@@ -51,5 +52,6 @@ private:
 	std::vector<std::vector<float>> getWaterFaces(int x, int y, int z);
 	
 	void update();
+	void genMesh();
 	void cavegen(int x, int y, int z);
 };

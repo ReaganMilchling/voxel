@@ -10,11 +10,14 @@ class World
 {
 public:
 	int m_size;
+	int m_render_distance;
 	Camera* m_camera;
 	glm::vec3* m_camera_pos;
 	
-	World(Camera*, int s);
+	World(Camera*, int s, int renderDistance);
 	~World();
+	inline int getChunkSize() { return m_loaded_chunk_map.size();};
+	inline int getViewableChunkSize() { return m_viewable_chunk_map.size();};
 	void generate();
 	void generatechunk(int x, int y);
 	void Render(Shader& shader);

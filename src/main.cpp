@@ -6,6 +6,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include <iostream>
+#include <string>
 #include <thread>
 
 #include "engine/shader.h"
@@ -110,9 +111,9 @@ int main()
     textureShader.Bind();
     rgbShader.Bind();
 
-    World world(&camera, 5);
-    //world.generate();
-    std::thread t1(&World::generate, &world);
+    World world(&camera, 5, 8);
+    world.generate();
+    //std::thread t1(&World::generate, &world);
     //std::cout << std::this_thread::get_id() << std::endl;
     //std::thread t1(&World::generatechunk, &world, 1, 0);
 
@@ -134,9 +135,11 @@ int main()
         if (timeDiff >= 1.0 / 15.0)
         {
             // Creates new title
-            std::string FPS = std::to_string((1.0 / timeDiff) * counter);
+            std::string FPS = std::to_string((int)((1.0 / timeDiff) * counter));
             std::string ms = std::to_string((timeDiff / counter) * 1000);
-            std::string newTitle = FPS + "FPS / " + ms + "ms";
+            std::string newTitle = FPS + " FPS / " + ms + "ms  -  X:" 
+                + std::to_string((int)camera.Position.x)+" Z:" + std::to_string((int)camera.Position.z) 
+                + "  -  " + std::to_string(world.getChunkSize()) + ":" + std::to_string(world.getViewableChunkSize());
             glfwSetWindowTitle(window, newTitle.c_str());
 
             // Resets times and counter
@@ -152,7 +155,7 @@ int main()
         // input
         processInput(window);
 
-        //world.update();
+        world.update();
 
         // render
         glClearColor(0.0f, 0.6f, 0.9f, 1.0f);

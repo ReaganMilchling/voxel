@@ -26,6 +26,7 @@ Chunk::Chunk(int32_t x, int32_t z, World* world)
 
     m_world = world;
     m_changed = true;
+    m_regen_mesh = true;
     m_vertex_ct = 0;
     m_water_vertex_ct = 0;
     
@@ -56,6 +57,33 @@ void Chunk::update()
         m_water_VA.Unbind();
         m_water_VB.Unbind();
 
+        genMesh();
+
+        // Calls custom made opengl api
+        // Most code courtesy of TheCherno
+        m_VB.AddBufferData(&m_mesh[0], m_mesh.size() * sizeof(float));
+        VertexBufferLayout layout;
+        layout.Push<float>(3);
+        layout.Push<float>(2);
+        layout.Push<float>(1);
+        m_VA.AddBuffer(m_VB, layout);
+        
+        //std::cout << std::this_thread::get_id() << " :meshSize: " << m_mesh.size() << std::endl;
+        m_water_VB.AddBufferData(&m_water_mesh[0], m_water_mesh.size() * sizeof(float));
+        m_water_VA.AddBuffer(m_water_VB, layout);
+
+        //std::cout << m_water_vertex_ct << std::endl;
+        //std::cout << m_water_mesh.size() << std::endl;
+
+        // update changed
+        m_changed = false;
+    }
+}
+
+void Chunk::genMesh()
+{
+    if (m_regen_mesh)
+    {
         //std::cout << "adding mesh" << std::endl;
         // recreate mesh
         for (int i = 0; i < m_horizontal_max; ++i)
@@ -87,24 +115,11 @@ void Chunk::update()
             }
         }
 
-        // Calls custom made opengl api
-        // Most code courtesy of TheCherno
-        m_VB.AddBufferData(&m_mesh[0], m_mesh.size() * sizeof(float));
-        VertexBufferLayout layout;
-        layout.Push<float>(3);
-        layout.Push<float>(2);
-        layout.Push<float>(1);
-        m_VA.AddBuffer(m_VB, layout);
-        
-        //std::cout << std::this_thread::get_id() << " :meshSize: " << m_mesh.size() << std::endl;
-        m_water_VB.AddBufferData(&m_water_mesh[0], m_water_mesh.size() * sizeof(float));
-        m_water_VA.AddBuffer(m_water_VB, layout);
-
-        //std::cout << m_water_vertex_ct << std::endl;
-        //std::cout << m_water_mesh.size() << std::endl;
+        //std::cout << std::this_thread::get_id() << " - mesh: " <<  m_vertex_ct << "-" << m_mesh.size() 
+        //<< "\twater:" << m_water_vertex_ct << "-" << m_water_mesh.size() << std::endl;
 
         // update changed
-        m_changed = false;
+        m_regen_mesh = false;
     }
 }
 
@@ -113,11 +128,14 @@ void Chunk::render(Shader &shader)
     if (m_chunk_mutex.try_lock())
     {
         if (m_mesh.size() == 0) 
+        {
             m_changed = true;
+            m_regen_mesh = true;
+        }
 
         update();
         //std::cout << m_mesh.size() << std::endl;
-        std::cout << std::this_thread::get_id() << " : " << m_vertex_ct << std::endl;
+        //std::cout << std::this_thread::get_id() << " : " << m_vertex_ct << std::endl;
 
         shader.Bind();
         m_VB.Bind();
@@ -243,9 +261,10 @@ void Chunk::gen()
                 }
             } 
             
-            cavegen(x, y, z);
+            //cavegen(x, y, z);
         }
     }
+    genMesh();
     m_chunk_mutex.unlock();
 }
 
