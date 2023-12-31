@@ -14,9 +14,8 @@
 #include "chunk.h"
 
 
-World::World(Camera* camera, int s, int renderDistance)
+World::World(Camera* camera, int renderDistance)
 {
-    m_size = s;
     m_render_distance = renderDistance;
     m_camera = camera;
     m_camera_pos = &camera->Position;
@@ -33,21 +32,7 @@ World::~World()
 
 void World::generate()
 {
-    for (int32_t i = 0; i < m_size; ++i) 
-    {
-        for (int32_t j = 0; j < m_size; ++j) {
-            Chunk *togen = new Chunk(i, j, this);
-            
-            std::pair<int, int> pair(i, j);
-
-            m_chunks_mutex.lock();
-            m_chunks.push_back(togen);
-            m_loaded_chunk_map[pair] = togen;
-            m_viewable_chunk_map[pair] = togen;
-            m_chunks_mutex.unlock();
-            //std::cout << std::this_thread::get_id() << " :coords: " << i << " : " << j << std::endl;
-        }
-    }
+    update();
 }
 
 void World::generatechunk(int x, int y)
@@ -103,7 +88,13 @@ void World::update()
         {
             for (int j = neg_dist; j <= m_render_distance; ++j)
             {
-                this->moveChunk(new_pos.x + i, new_pos.y + j);
+                if ((std::abs(i) == m_render_distance) && (std::abs(j) == m_render_distance))
+                {
+                }
+                else 
+                {
+                    this->moveChunk(new_pos.x + i, new_pos.y + j);
+                }
             }
         }        
         m_previous_pos = new_pos;
@@ -113,6 +104,8 @@ void World::update()
 
 float World::getBlockInWorld(int w_x, int w_z, int x, int y, int z)
 {
+    if (y >= y_max || y < 0) { return -1.0f; }
+
     std::pair p(w_x, w_z);
     try 
     {
@@ -128,15 +121,39 @@ float World::getBlockInWorld(int w_x, int w_z, int x, int y, int z)
 
 float World::getBlockInWorld(int x, int y, int z)
 {
-    int w_x = x / 16;
-    int w_z = z / 16;
-    int t_x = x % 16;
-    int t_z = z % 16;
-    for (Chunk* c : m_chunks) {
-        if (c->getX() == w_x && c->getZ() == w_z)
-        {
-            return c->get(t_x, y, t_z);
+    if (y >= y_max || y < 0) { return -1.0f; }
+
+    int w_x = x / xz;
+    int w_z = z / xz;
+    int t_x = x % xz;
+    int t_z = z % xz;
+
+    if (t_x < 0) 
+    {
+        if (w_x == 0) {
+            w_x = -1;
+        } else {
+            t_x = xz + t_x;
         }
     }
-    return -1.0f;
+
+    if (t_z < 0) 
+    {
+        if (w_z == 0) {
+            w_z = -1;
+        } else {
+            t_z = xz + t_z;
+        }
+    }
+    std::cout << w_x << ":" << w_z << " - " << t_x << ":" << y << ":" << t_z << std::endl;
+    std::pair p(w_x, w_z);
+    try 
+    {
+        Chunk* chunk = m_loaded_chunk_map.at(p);
+        return chunk->get(t_x, y, t_z);
+    } 
+    catch (std::out_of_range) 
+    {
+        return -1.0f;
+    }
 }

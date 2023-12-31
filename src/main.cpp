@@ -20,7 +20,7 @@
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
-void processInput(GLFWwindow* window);
+void processInput(GLFWwindow* window, World* world);
 
 // settings
 const unsigned int SCR_WIDTH = 1920;
@@ -111,7 +111,7 @@ int main()
     textureShader.Bind();
     rgbShader.Bind();
 
-    World world(&camera, 5, 8);
+    World world(&camera, 5);
     world.generate();
     //std::thread t1(&World::generate, &world);
     //std::cout << std::this_thread::get_id() << std::endl;
@@ -153,7 +153,7 @@ int main()
         lastFrame = currentFrame;
 
         // input
-        processInput(window);
+        processInput(window, &world);
 
         world.update();
 
@@ -200,24 +200,24 @@ int main()
 }
 
 // process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
-void processInput(GLFWwindow* window)
+void processInput(GLFWwindow* window, World* world)
 {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-        camera.ProcessKeyboard(FORWARD, deltaTime);
+        camera.ProcessKeyboard(FORWARD, deltaTime, world);
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-        camera.ProcessKeyboard(BACKWARD, deltaTime);
+        camera.ProcessKeyboard(BACKWARD, deltaTime, world);
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-        camera.ProcessKeyboard(LEFT, deltaTime);
+        camera.ProcessKeyboard(LEFT, deltaTime,  world);
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-        camera.ProcessKeyboard(RIGHT, deltaTime);
+        camera.ProcessKeyboard(RIGHT, deltaTime, world);
     if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
-        camera.ProcessKeyboard(UPWARD, deltaTime);
+        camera.ProcessKeyboard(UPWARD, deltaTime, world);
     if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
-        camera.ProcessKeyboard(DOWNWARD, deltaTime);
+        camera.ProcessKeyboard(DOWNWARD, deltaTime, world);
     if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
-        camera.ProcessKeyboard(INCSPEED, deltaTime);
+        camera.ProcessKeyboard(INCSPEED, deltaTime, world);
     if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS)
     {
         GLint mode[2];

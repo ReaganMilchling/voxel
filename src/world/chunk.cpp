@@ -261,7 +261,7 @@ void Chunk::gen()
                 }
             } 
             
-            //cavegen(x, y, z);
+            cavegen(x, y, z);
         }
     }
     genMesh();

@@ -19,31 +19,6 @@ Input::~Input()
 // process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
 void Input::processInput(GLFWwindow* window)
 {
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-        glfwSetWindowShouldClose(window, true);
-    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-        m_Camera.ProcessKeyboard(FORWARD, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-        m_Camera.ProcessKeyboard(BACKWARD, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-        m_Camera.ProcessKeyboard(LEFT, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-        m_Camera.ProcessKeyboard(RIGHT, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
-        m_Camera.ProcessKeyboard(UPWARD, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
-        m_Camera.ProcessKeyboard(DOWNWARD, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS)
-    {
-        GLint mode[2];
-        glGetIntegerv(GL_POLYGON_MODE, mode);
-        if (mode[1] == GL_LINE && mode[0] == GL_LINE) {
-            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-        }
-        else {
-            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-        }
-    }
 }
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes

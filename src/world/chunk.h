@@ -10,7 +10,7 @@
 class World;
 
 const int xz = 32;
-const int y = 128;
+const int y_max = 128;
 
 class Chunk
 {
@@ -31,11 +31,11 @@ private:
 	int32_t chunk_x, chunk_z;
 	
 	int m_horizontal_max = xz;
-	int m_y_max = y;
+	int m_y_max = y_max;
 	
 	World* m_world;
 	std::mutex m_chunk_mutex;
-	float chunk[xz][y][xz];
+	float chunk[xz][y_max][xz];
 	bool m_changed;
 	bool m_regen_mesh;
 
