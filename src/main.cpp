@@ -27,7 +27,7 @@ const unsigned int SCR_WIDTH = 1920;
 const unsigned int SCR_HEIGHT = 1080;
 
 // camera
-Camera camera(glm::vec3(64.0f, 164.0f, 64.0f));
+Camera camera(glm::vec3(0.0f, 129.0f, 0.0f));
 float lastX = SCR_WIDTH / 2.0f;
 float lastY = SCR_HEIGHT / 2.0f;
 bool firstMouse = true;
@@ -111,7 +111,7 @@ int main()
     textureShader.Bind();
     rgbShader.Bind();
 
-    World world(&camera, 5);
+    World world(&camera, 3);
     world.generate();
     //std::thread t1(&World::generate, &world);
     //std::cout << std::this_thread::get_id() << std::endl;
@@ -179,7 +179,7 @@ int main()
 
         // MVP
         //player.getcamera
-        glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 300.0f);
+        glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.01f, 300.0f);
         glm::mat4 view = camera.GetViewMatrix();
         glm::mat4 model = glm::mat4(1.0f);
         glm::mat4 mvp = projection * view * model;

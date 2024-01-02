@@ -94,6 +94,7 @@ void World::update()
                 else 
                 {
                     this->moveChunk(new_pos.x + i, new_pos.y + j);
+                    //std::cout << new_pos.x + i << "=x - z="<<new_pos.y+j << "\n";
                 }
             }
         }        
@@ -128,24 +129,20 @@ float World::getBlockInWorld(int x, int y, int z)
     int t_x = x % xz;
     int t_z = z % xz;
 
+    // this adjusts negative values since w_z,w_x is bottom left and goes toward 0,0
+    // decrementing world x,y prevents needing -0
     if (t_x < 0) 
     {
-        if (w_x == 0) {
-            w_x = -1;
-        } else {
-            t_x = xz + t_x;
-        }
+        t_x = xz + t_x;
+        w_x -= 1;
     }
 
     if (t_z < 0) 
     {
-        if (w_z == 0) {
-            w_z = -1;
-        } else {
-            t_z = xz + t_z;
-        }
+        t_z = xz + t_z;
+        w_z -= 1;
     }
-    std::cout << w_x << ":" << w_z << " - " << t_x << ":" << y << ":" << t_z << std::endl;
+    //std::cout << w_x << ":" << w_z << " - " << t_x << ":" << t_z<< " ------ " << x << ":" << y << ":" << z << std::endl;
     std::pair p(w_x, w_z);
     try 
     {

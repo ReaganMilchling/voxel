@@ -37,29 +37,6 @@ glm::mat4 Camera::GetViewMatrix()
 // processes input received from any keyboard-like input system. Accepts input parameter in the form of camera defined ENUM (to abstract it from windowing systems)
 void Camera::ProcessKeyboard(Camera_Movement direction, float deltaTime, World* world)
 {
-    glm::vec3 old_pos = Position;
-    float velocity = MovementSpeed * deltaTime;
-    if (direction == FORWARD)
-    {
-        Position += Front * velocity;
-        //Position += glm::vec3(0.0f, 0.0f, 1.0f) * velocity;
-    }
-    if (direction == BACKWARD)
-    {
-        Position -= Front * velocity;
-        //Position -= glm::vec3(0.0f, 0.0f, 1.0f) * velocity;
-    }
-    if (direction == LEFT)
-    {
-        Position -= Right * velocity;
-        //Position -= glm::vec3(1.0f, 0.0f, 0.0f) * velocity;
-    }
-    if (direction == RIGHT)
-    {
-        Position += Right * velocity;
-        //Position += glm::vec3(1.0f, 0.0f, 0.0f) * velocity;
-    }
-
     if( direction == INCSPEED)
     {
         if (MovementSpeed == SPEED) 
@@ -70,26 +47,73 @@ void Camera::ProcessKeyboard(Camera_Movement direction, float deltaTime, World* 
         {
             MovementSpeed = SPEED;
         }
+        return;
     }
 
-    // make sure the user stays at the ground level
-    //Position.y = 0.0f; // <-- this one-liner keeps the user at the ground level (xz plane)
+    glm::vec3 old_pos = Position;
+    glm::vec3 new_pos = Position;
+    glm::vec3 delta(0.0f);
+    glm::vec3 new_delta(0.0f);
+    float velocity = MovementSpeed * deltaTime;
+
+    if (direction == FORWARD)
+    {
+        delta += Front * velocity;
+        //Position += glm::vec3(0.0f, 0.0f, 1.0f) * velocity;
+    }
+    if (direction == BACKWARD)
+    {
+        delta -= Front * velocity;
+        //Position -= glm::vec3(0.0f, 0.0f, 1.0f) * velocity;
+    }
+    if (direction == LEFT)
+    {
+        delta -= Right * velocity;
+        //Position -= glm::vec3(1.0f, 0.0f, 0.0f) * velocity;
+    }
+    if (direction == RIGHT)
+    {
+        delta += Right * velocity;
+        //Position += glm::vec3(1.0f, 0.0f, 0.0f) * velocity;
+    }
     if (direction == DOWNWARD)
     {
-        Position -= glm::vec3(0.0f, 1.0f, 0.0f) * velocity;
+        delta -= glm::vec3(0.0f, 1.0f, 0.0f) * velocity;
     }
     if (direction == UPWARD)
     {
-        Position += glm::vec3(0.0f, 1.0f, 0.0f) * velocity;
+        delta += glm::vec3(0.0f, 1.0f, 0.0f) * velocity;
+    }
+
+    
+    // gravity
+    //Position.y = 0.0f; // <-- this one-liner keeps the user at the ground level (xz plane)
+
+    // collisions separated by x, y, z
+    new_pos += delta;
+
+    float x_block = world->getBlockInWorld((int)(new_pos.x+0.0f), (int)Position.y, (int)Position.z);
+    if (x_block <= 0.0f || x_block == 4.0f)
+    {
+        new_delta.x = delta.x;
     }
     
-    float block = world->getBlockInWorld((int)Position.x, (int)Position.y, (int)Position.z);
-    if (block > 0.0f && block != 4.0f)
+    float y_block = world->getBlockInWorld((int)Position.x, (int)(new_pos.y+0.0f), (int)Position.z);
+    if (y_block <= 0.0f || y_block == 4.0f)
     {
-        std::cout << "Collision x:" << Position.x << " y:" << Position.y << " z:" << Position.z << " b:" << block << std::endl;
-        std::cout << "Collision x:" << (int)Position.x << " y:" << (int)Position.y << " z:" << (int)Position.z << std::endl;
-        Position = old_pos;
+        new_delta.y = delta.y;
     }
+
+    float z_block = world->getBlockInWorld((int)Position.x, (int)Position.y, (int)(new_pos.z+0.0f));
+    if (z_block <= 0.0f || z_block == 4.0f)
+    {
+        new_delta.z = delta.z;
+    }
+    //std::cout << "movement:" << delta.x << " y:" << delta.y << " z:" << delta.z << std::endl;
+    //std::cout << "movement:" << new_delta.x << " y:" << new_delta.y << " z:" << new_delta.z << std::endl;
+
+
+    Position += new_delta;
 }
 
 // processes input received from a mouse input system. Expects the offset value in both the x and y direction.
