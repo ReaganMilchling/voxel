@@ -27,7 +27,7 @@ const unsigned int SCR_WIDTH = 1920;
 const unsigned int SCR_HEIGHT = 1080;
 
 // camera
-Camera camera(glm::vec3(0.0f, 129.0f, 0.0f));
+Camera camera(glm::vec3(32.0f, 129.0f, 32.0f));
 float lastX = SCR_WIDTH / 2.0f;
 float lastY = SCR_HEIGHT / 2.0f;
 bool firstMouse = true;
@@ -111,13 +111,14 @@ int main()
     textureShader.Bind();
     rgbShader.Bind();
 
-    World world(&camera, 3);
+    World world(&camera, 5);
     world.generate();
     //std::thread t1(&World::generate, &world);
     //std::cout << std::this_thread::get_id() << std::endl;
     //std::thread t1(&World::generatechunk, &world, 1, 0);
 
-    // Variables to create periodic event for FPS displaying
+    // time step and frame time calculation variables
+    double dt = 0.01;
     double prevTime = 0.0;
     double crntTime = 0.0;
     double timeDiff;
@@ -132,14 +133,18 @@ int main()
         timeDiff = crntTime - prevTime;
         counter++;
 
-        if (timeDiff >= 1.0 / 15.0)
+        if (timeDiff >= dt)
         {
             // Creates new title
             std::string FPS = std::to_string((int)((1.0 / timeDiff) * counter));
             std::string ms = std::to_string((timeDiff / counter) * 1000);
             std::string newTitle = FPS + " FPS / " + ms + "ms  -  X:" 
-                + std::to_string((int)camera.Position.x)+" Z:" + std::to_string((int)camera.Position.z) 
-                + "  -  " + std::to_string(world.getChunkSize()) + ":" + std::to_string(world.getViewableChunkSize());
+                + std::to_string((int)camera.Position.x)
+                + " Y:" + std::to_string((int)camera.Position.y) 
+                + " Z:" + std::to_string((int)camera.Position.z) 
+                + "  -  " + std::to_string(world.getChunkSize()) + ":" + std::to_string(world.getViewableChunkSize())
+                + " Collisions:" + std::to_string(camera.collisions)
+                + " Fly:" + std::to_string(camera.fly);
             glfwSetWindowTitle(window, newTitle.c_str());
 
             // Resets times and counter
@@ -154,7 +159,7 @@ int main()
 
         // input
         processInput(window, &world);
-
+        camera.update(&world);
         world.update();
 
         // render
@@ -226,6 +231,24 @@ void processInput(GLFWwindow* window, World* world)
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
         } else {
             glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        }
+    }
+    if (glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS)
+    {
+        if (camera.collisions) {
+            camera.collisions = false;
+            camera.fly = true;
+        } else {
+            camera.collisions = true;
+            camera.fly = false;
+        }
+    }
+    if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS)
+    {
+        if (camera.fly) {
+            camera.fly = false;
+        } else {
+            camera.fly = true;
         }
     }
 }

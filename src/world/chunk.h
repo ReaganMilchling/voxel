@@ -30,6 +30,8 @@ private:
 	float chunk_x_f, chunk_z_f;
 	int32_t chunk_x, chunk_z;
 	
+	float m_scale = 1.0f;
+	
 	int m_horizontal_max = xz;
 	int m_y_max = y_max;
 	

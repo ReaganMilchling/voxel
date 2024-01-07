@@ -15,6 +15,7 @@ enum Camera_Movement {
     UPWARD,
     DOWNWARD,
     INCSPEED,
+    JUMP
 };
 
 // Default camera values
@@ -27,6 +28,8 @@ const float ZOOM = 90.0f;
 class Camera
 {
 public:
+    bool collisions = false;
+    bool fly = true;
     // camera Attributes
     glm::vec3 Position;
     glm::vec3 Front;
@@ -40,6 +43,8 @@ public:
     float MovementSpeed;
     float MouseSensitivity;
     float Zoom;
+
+    void update(World* world);
 
     // constructor with vectors
     Camera(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f), float yaw = YAW, float pitch = PITCH);

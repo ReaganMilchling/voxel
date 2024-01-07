@@ -29,6 +29,22 @@ Camera::Camera(float posX, float posY, float posZ, float upX, float upY, float u
     updateCameraVectors();
 }
 
+void Camera::update(World* world)
+{
+    if (!fly) {
+        glm::vec3 new_pos = Position;
+        
+        float y_block = world->getBlockInWorld((int)Position.x, (int)(new_pos.y-0.05f), (int)Position.z);
+        if (y_block <= 0.0f || y_block == 4.0f)
+        {
+            new_pos.y -= 0.05f;
+        }
+
+        Position = new_pos;
+    }
+    
+}
+
 glm::mat4 Camera::GetViewMatrix()
 {
     return glm::lookAt(Position, Position + Front, Up);
@@ -82,7 +98,20 @@ void Camera::ProcessKeyboard(Camera_Movement direction, float deltaTime, World* 
     }
     if (direction == UPWARD)
     {
-        delta += glm::vec3(0.0f, 1.0f, 0.0f) * velocity;
+        if (fly) {
+            delta += glm::vec3(0.0f, 1.0f, 0.0f) * velocity;
+        } else {
+            float player = world->getBlockInWorld((int)Position.x, (int)(Position.y), (int)Position.z);
+            float ground = world->getBlockInWorld((int)Position.x, (int)(Position.y) - 1, (int)Position.z);
+            if (ground > 0.0f) 
+            {
+                if (ground == 4.0f) {
+                    delta += glm::vec3(0.0f, 0.25f, 0.0f);
+                } else {
+                    delta += glm::vec3(0.0f, 1.75f, 0.0f);
+                }
+            }
+        }
     }
 
     
@@ -91,23 +120,32 @@ void Camera::ProcessKeyboard(Camera_Movement direction, float deltaTime, World* 
 
     // collisions separated by x, y, z
     new_pos += delta;
-
-    float x_block = world->getBlockInWorld((int)(new_pos.x+0.0f), (int)Position.y, (int)Position.z);
-    if (x_block <= 0.0f || x_block == 4.0f)
-    {
-        new_delta.x = delta.x;
-    }
     
-    float y_block = world->getBlockInWorld((int)Position.x, (int)(new_pos.y+0.0f), (int)Position.z);
-    if (y_block <= 0.0f || y_block == 4.0f)
+    if (collisions)
     {
-        new_delta.y = delta.y;
-    }
+        float x_block = world->getBlockInWorld((int)(new_pos.x+0.0f), (int)Position.y, (int)Position.z);
+        if (x_block <= 0.0f || x_block == 4.0f)
+        {
+            new_delta.x = delta.x;
+        }
 
-    float z_block = world->getBlockInWorld((int)Position.x, (int)Position.y, (int)(new_pos.z+0.0f));
-    if (z_block <= 0.0f || z_block == 4.0f)
-    {
-        new_delta.z = delta.z;
+        if (fly || direction == UPWARD)
+        {
+            float y_block = world->getBlockInWorld((int)Position.x, (int)(new_pos.y+0.0f), (int)Position.z);
+            if (y_block <= 0.0f || y_block == 4.0f)
+            {
+                new_delta.y = delta.y;
+            }
+        }
+
+        float z_block = world->getBlockInWorld((int)Position.x, (int)Position.y, (int)(new_pos.z+0.0f));
+        if (z_block <= 0.0f || z_block == 4.0f)
+        {
+            new_delta.z = delta.z;
+        }
+    }
+    else {
+        new_delta = delta;
     }
     //std::cout << "movement:" << delta.x << " y:" << delta.y << " z:" << delta.z << std::endl;
     //std::cout << "movement:" << new_delta.x << " y:" << new_delta.y << " z:" << new_delta.z << std::endl;

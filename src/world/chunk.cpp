@@ -190,6 +190,8 @@ void Chunk::gen()
                 frequency *= lacunarity;
             }
 
+            // this functions as a really naive splin/step function
+            // maps -1,1 to -.34,2, uses 0 as level 64 for water
             noiseHeight += .41420f;
             if (noiseHeight > 0.0f) {
                 noiseHeight *= noiseHeight;
