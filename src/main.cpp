@@ -112,6 +112,9 @@ int main()
     textureShader.Bind();
     rgbShader.Bind();
 
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
+
     World world(&camera, 5);
     world.generate();
     //std::thread t1(&World::generate, &world);
@@ -123,7 +126,7 @@ int main()
     double prevTime = 0.0;
     double crntTime = 0.0;
     double timeDiff;
-    unsigned int counter = 0; // Keeps track of the amount of frames in timeDiff
+    unsigned int counter = 0, tick = 0; // Keeps track of the amount of frames in timeDiff
 
     // render loop
     // -----------
@@ -139,14 +142,12 @@ int main()
             // Creates new title
             std::string FPS = std::to_string((int)((1.0 / timeDiff) * counter));
             std::string ms = std::to_string((timeDiff / counter) * 1000);
-            std::string newTitle = FPS + " FPS / " + ms + "ms  -  X:" 
-                + std::to_string((int)camera.Position.x)
-                + " Y:" + std::to_string((int)camera.Position.y) 
-                + " Z:" + std::to_string((int)camera.Position.z) 
-                + "  -  " + std::to_string(world.getChunkSize()) + ":" + std::to_string(world.getViewableChunkSize())
+            std::string newTitle = FPS + " FPS / " + ms + "ms  -  " 
+                + std::to_string(world.getChunkSize()) + ":" + std::to_string(world.getViewableChunkSize())
                 + " Collisions:" + std::to_string(camera.collisions)
                 + " Fly:" + std::to_string(camera.fly)
-                + " Position:" + glm::to_string(camera.Position);
+                + " Position:" + glm::to_string(camera.Position)
+                + " tick:" + std::to_string(tick);
             glfwSetWindowTitle(window, newTitle.c_str());
 
             // Resets times and counter
@@ -155,7 +156,7 @@ int main()
         }
 
         // per-frame time logic
-        float currentFrame = static_cast<float>(glfwGetTime());
+        double currentFrame = static_cast<double>(glfwGetTime());
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
 
@@ -242,7 +243,6 @@ void processInput(GLFWwindow* window, World* world)
             camera.fly = true;
         } else {
             camera.collisions = true;
-            camera.fly = false;
         }
     }
     if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS)

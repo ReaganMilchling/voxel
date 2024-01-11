@@ -312,10 +312,10 @@ std::vector<std::vector<float>> Chunk::getVisibleFaces(int i, int j, int k)
         std::vector<float> temp = {
             //left  
            1.0f + x_value, 1.0f + y_value, 1.0f + z_value,  1.0f, 0.0f, chunk[i][j][k],
-           1.0f + x_value, 1.0f + y_value,        z_value,  1.0f, 1.0f, chunk[i][j][k],
+           1.0f + x_value,        y_value, 1.0f + z_value,  1.0f, 1.0f, chunk[i][j][k],
            1.0f + x_value,        y_value,        z_value,  0.0f, 1.0f, chunk[i][j][k],
            1.0f + x_value,        y_value,        z_value,  0.0f, 1.0f, chunk[i][j][k],
-           1.0f + x_value,        y_value, 1.0f + z_value,  0.0f, 0.0f, chunk[i][j][k],
+           1.0f + x_value, 1.0f + y_value,        z_value,  0.0f, 0.0f, chunk[i][j][k],
            1.0f + x_value, 1.0f + y_value, 1.0f + z_value,  1.0f, 0.0f, chunk[i][j][k]
         };
         ret.push_back(temp);
@@ -326,12 +326,12 @@ std::vector<std::vector<float>> Chunk::getVisibleFaces(int i, int j, int k)
     {
         std::vector<float> temp = {
             //right
-                   x_value, 1.0f + y_value, 1.0f + z_value,  1.0f, 0.0f, chunk[i][j][k],
-                   x_value, 1.0f + y_value,        z_value,  1.0f, 1.0f, chunk[i][j][k],
-                   x_value,        y_value,        z_value,  0.0f, 1.0f, chunk[i][j][k],
-                   x_value,        y_value,        z_value,  0.0f, 1.0f, chunk[i][j][k],
-                   x_value,        y_value, 1.0f + z_value,  0.0f, 0.0f, chunk[i][j][k],
-                   x_value, 1.0f + y_value, 1.0f + z_value,  1.0f, 0.0f, chunk[i][j][k]
+            x_value, 1.0f + y_value, 1.0f + z_value,  1.0f, 0.0f, chunk[i][j][k],
+            x_value, 1.0f + y_value,        z_value,  1.0f, 1.0f, chunk[i][j][k],
+            x_value,        y_value,        z_value,  0.0f, 1.0f, chunk[i][j][k],
+            x_value,        y_value,        z_value,  0.0f, 1.0f, chunk[i][j][k],
+            x_value,        y_value, 1.0f + z_value,  0.0f, 0.0f, chunk[i][j][k],
+            x_value, 1.0f + y_value, 1.0f + z_value,  1.0f, 0.0f, chunk[i][j][k]
         };
         ret.push_back(temp);
     }
@@ -366,10 +366,10 @@ std::vector<std::vector<float>> Chunk::getVisibleFaces(int i, int j, int k)
         std::vector<float> temp = {
             //top
                    x_value, 1.0f + y_value,        z_value,  0.0f, 1.0f, chunk[i][j][k],
-            1.0f + x_value, 1.0f + y_value,        z_value,  1.0f, 1.0f, chunk[i][j][k],
+                   x_value, 1.0f + y_value, 1.0f + z_value,  1.0f, 1.0f, chunk[i][j][k],
             1.0f + x_value, 1.0f + y_value, 1.0f + z_value,  1.0f, 0.0f, chunk[i][j][k],
             1.0f + x_value, 1.0f + y_value, 1.0f + z_value,  1.0f, 0.0f, chunk[i][j][k],
-                   x_value, 1.0f + y_value, 1.0f + z_value,  0.0f, 0.0f, chunk[i][j][k],
+            1.0f + x_value, 1.0f + y_value,        z_value,  0.0f, 0.0f, chunk[i][j][k],
                    x_value, 1.0f + y_value,        z_value,  0.0f, 1.0f, chunk[i][j][k]
         };
         ret.push_back(temp);
@@ -380,12 +380,12 @@ std::vector<std::vector<float>> Chunk::getVisibleFaces(int i, int j, int k)
     {
         std::vector<float> temp = {
             //front
-                   x_value,        y_value,        z_value,  0.0f, 0.0f, chunk[i][j][k],
-            1.0f + x_value,        y_value,        z_value,  1.0f, 0.0f, chunk[i][j][k],
-            1.0f + x_value, 1.0f + y_value,        z_value,  1.0f, 1.0f, chunk[i][j][k],
-            1.0f + x_value, 1.0f + y_value,        z_value,  1.0f, 1.0f, chunk[i][j][k],
-                   x_value, 1.0f + y_value,        z_value,  0.0f, 1.0f, chunk[i][j][k],
-                   x_value,        y_value,        z_value,  0.0f, 0.0f, chunk[i][j][k]
+                   x_value,        y_value, z_value,  0.0f, 0.0f, chunk[i][j][k],
+                   x_value, 1.0f + y_value, z_value,  0.0f, 1.0f, chunk[i][j][k],
+            1.0f + x_value, 1.0f + y_value, z_value,  1.0f, 1.0f, chunk[i][j][k],
+            1.0f + x_value, 1.0f + y_value, z_value,  1.0f, 1.0f, chunk[i][j][k],
+            1.0f + x_value,        y_value, z_value,  1.0f, 0.0f, chunk[i][j][k],
+                   x_value,        y_value, z_value,  0.0f, 0.0f, chunk[i][j][k]
         };
         ret.push_back(temp);
     }
@@ -421,14 +421,15 @@ std::vector<std::vector<float>> Chunk::getWaterFaces(int i, int j, int k)
     
     if ((j == m_y_max - 1 || chunk[i][j + 1][k] == 0))
     {
+
         std::vector<float> temp = {
             //top
-                   x_value,  0.4f + y_value,        z_value,  0.0f, 1.0f, chunk[i][j][k],
-            1.0f + x_value,  0.4f + y_value,        z_value,  1.0f, 1.0f, chunk[i][j][k],
-            1.0f + x_value,  0.4f + y_value, 1.0f + z_value,  1.0f, 0.0f, chunk[i][j][k],
-            1.0f + x_value,  0.4f + y_value, 1.0f + z_value,  1.0f, 0.0f, chunk[i][j][k],
-                   x_value,  0.4f + y_value, 1.0f + z_value,  0.0f, 0.0f, chunk[i][j][k],
-                   x_value,  0.4f + y_value,        z_value,  0.0f, 1.0f, chunk[i][j][k]
+                   x_value,  0.8f + y_value,        z_value,  0.0f, 1.0f, chunk[i][j][k],
+                   x_value,  0.8f + y_value, 1.0f + z_value,  1.0f, 1.0f, chunk[i][j][k],
+            1.0f + x_value,  0.8f + y_value, 1.0f + z_value,  1.0f, 0.0f, chunk[i][j][k],
+            1.0f + x_value,  0.8f + y_value, 1.0f + z_value,  1.0f, 0.0f, chunk[i][j][k],
+            1.0f + x_value,  0.8f + y_value,        z_value,  0.0f, 0.0f, chunk[i][j][k],
+                   x_value,  0.8f + y_value,        z_value,  0.0f, 1.0f, chunk[i][j][k]
         };
         ret.push_back(temp);
     }

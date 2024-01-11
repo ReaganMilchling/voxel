@@ -144,7 +144,7 @@ float World::getBlockInWorld(float x, float y, float z)
         t_z += (xz - 1);
     } 
 
-    std::cout << w_x << ":" << w_z << " - " << t_x << ":" << t_z<< " ------ " << x << ":" << y << ":" << z << std::endl;
+    //std::cout << w_x << ":" << w_z << " - " << t_x << ":" << t_z<< " ------ " << x << ":" << y << ":" << z << std::endl;
     std::pair p(w_x, w_z);
     try 
     {
