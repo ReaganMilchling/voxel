@@ -338,24 +338,14 @@ std::vector<std::vector<float>> Chunk::getVisibleFaces(int i, int j, int k)
 
     if ((j != 0 && chunk[i][j - 1][k] == 0) || (j != 0 && chunk[i][j - 1][k] == 4.0f))
     {
-        //This wasn't working properly but top(y-1) did
-        //std::vector<float> temp = {
-        //    //bottom
-        //           (float)i + (float)(16 chunk_x_f,        y_value,        (float)k + (float)(16 chunk_z_f,  0.0f, 1.0f,
-        //    1.0f + (float)i + (float)(16 chunk_x_f,        y_value,        (float)k + (float)(16 chunk_z_f,  1.0f, 1.0f,
-        //    1.0f + (float)i + (float)(16 chunk_x_f,        y_value, 1.0f + (float)k + (float)(16 chunk_z_f,  1.0f, 0.0f,
-        //    1.0f + (float)i + (float)(16 chunk_x_f,        y_value, 1.0f + (float)k + (float)(16 chunk_z_f,  1.0f, 0.0f,
-        //           (float)i + (float)(16 chunk_x_f,        y_value, 1.0f + (float)k + (float)(16 chunk_z_f,  0.0f, 0.0f,
-        //           (float)i + (float)(16 chunk_x_f,        y_value,        (float)k + (float)(16 chunk_z_f,  0.0f, 1.0f,
-        //};
         std::vector<float> temp = {
-            //top
-                   x_value, 1.0f + y_value-1,        z_value,  0.0f, 1.0f, chunk[i][j][k],
-            1.0f + x_value, 1.0f + y_value-1,        z_value,  1.0f, 1.0f, chunk[i][j][k],
-            1.0f + x_value, 1.0f + y_value-1, 1.0f + z_value,  1.0f, 0.0f, chunk[i][j][k],
-            1.0f + x_value, 1.0f + y_value-1, 1.0f + z_value,  1.0f, 0.0f, chunk[i][j][k],
-                   x_value, 1.0f + y_value-1, 1.0f + z_value,  0.0f, 0.0f, chunk[i][j][k],
-                   x_value, 1.0f + y_value-1,        z_value,  0.0f, 1.0f, chunk[i][j][k]
+            //bottom
+                   x_value, y_value,        z_value,  0.0f, 1.0f, chunk[i][j][k],
+            1.0f + x_value, y_value,        z_value,  1.0f, 1.0f, chunk[i][j][k],
+            1.0f + x_value, y_value, 1.0f + z_value,  1.0f, 0.0f, chunk[i][j][k],
+            1.0f + x_value, y_value, 1.0f + z_value,  1.0f, 0.0f, chunk[i][j][k],
+                   x_value, y_value, 1.0f + z_value,  0.0f, 0.0f, chunk[i][j][k],
+                   x_value, y_value,        z_value,  0.0f, 1.0f, chunk[i][j][k]
         };
         ret.push_back(temp);
 
