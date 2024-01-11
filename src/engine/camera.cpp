@@ -34,7 +34,7 @@ void Camera::update(World* world)
     if (!fly) {
         glm::vec3 new_pos = Position;
         
-        float y_block = world->getBlockInWorld((int)Position.x, (int)(new_pos.y-0.05f), (int)Position.z);
+        float y_block = world->getBlockInWorld(Position.x, (new_pos.y-0.05f), Position.z);
         if (y_block <= 0.0f || y_block == 4.0f)
         {
             new_pos.y -= 0.05f;
@@ -101,8 +101,8 @@ void Camera::ProcessKeyboard(Camera_Movement direction, float deltaTime, World* 
         if (fly) {
             delta += glm::vec3(0.0f, 1.0f, 0.0f) * velocity;
         } else {
-            float player = world->getBlockInWorld((int)Position.x, (int)(Position.y), (int)Position.z);
-            float ground = world->getBlockInWorld((int)Position.x, (int)(Position.y) - 1, (int)Position.z);
+            float player = world->getBlockInWorld(Position.x, (Position.y), Position.z);
+            float ground = world->getBlockInWorld(Position.x, (Position.y) - 1, Position.z);
             if (ground > 0.0f) 
             {
                 if (ground == 4.0f) {
@@ -123,7 +123,7 @@ void Camera::ProcessKeyboard(Camera_Movement direction, float deltaTime, World* 
     
     if (collisions)
     {
-        float x_block = world->getBlockInWorld((int)(new_pos.x+0.0f), (int)Position.y, (int)Position.z);
+        float x_block = world->getBlockInWorld((new_pos.x), Position.y, Position.z);
         if (x_block <= 0.0f || x_block == 4.0f)
         {
             new_delta.x = delta.x;
@@ -131,14 +131,14 @@ void Camera::ProcessKeyboard(Camera_Movement direction, float deltaTime, World* 
 
         if (fly || direction == UPWARD)
         {
-            float y_block = world->getBlockInWorld((int)Position.x, (int)(new_pos.y+0.0f), (int)Position.z);
+            float y_block = world->getBlockInWorld(Position.x, (new_pos.y), Position.z);
             if (y_block <= 0.0f || y_block == 4.0f)
             {
                 new_delta.y = delta.y;
             }
         }
 
-        float z_block = world->getBlockInWorld((int)Position.x, (int)Position.y, (int)(new_pos.z+0.0f));
+        float z_block = world->getBlockInWorld(Position.x, Position.y, (new_pos.z));
         if (z_block <= 0.0f || z_block == 4.0f)
         {
             new_delta.z = delta.z;

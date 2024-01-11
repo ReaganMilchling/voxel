@@ -4,6 +4,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <glm/gtx/string_cast.hpp>
 
 #include <iostream>
 #include <string>
@@ -27,7 +28,7 @@ const unsigned int SCR_WIDTH = 1920;
 const unsigned int SCR_HEIGHT = 1080;
 
 // camera
-Camera camera(glm::vec3(32.0f, 129.0f, 32.0f));
+Camera camera(glm::vec3(0.0f, 129.0f, -32.0f));
 float lastX = SCR_WIDTH / 2.0f;
 float lastY = SCR_HEIGHT / 2.0f;
 bool firstMouse = true;
@@ -144,7 +145,8 @@ int main()
                 + " Z:" + std::to_string((int)camera.Position.z) 
                 + "  -  " + std::to_string(world.getChunkSize()) + ":" + std::to_string(world.getViewableChunkSize())
                 + " Collisions:" + std::to_string(camera.collisions)
-                + " Fly:" + std::to_string(camera.fly);
+                + " Fly:" + std::to_string(camera.fly)
+                + " Position:" + glm::to_string(camera.Position);
             glfwSetWindowTitle(window, newTitle.c_str());
 
             // Resets times and counter

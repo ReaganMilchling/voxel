@@ -120,29 +120,31 @@ float World::getBlockInWorld(int w_x, int w_z, int x, int y, int z)
 
 }
 
-float World::getBlockInWorld(int x, int y, int z)
+float World::getBlockInWorld(float x, float y, float z)
 {
     if (y >= y_max || y < 0) { return -1.0f; }
 
-    int w_x = x / xz;
-    int w_z = z / xz;
-    int t_x = x % xz;
-    int t_z = z % xz;
+    int w_x = (int)x / xz;
+    int t_x = (int)x % xz;
+
+    int w_z = (int)z / xz;
+    int t_z = (int)z % xz;
 
     // this adjusts negative values since w_z,w_x is bottom left and goes toward 0,0
     // decrementing world x,y prevents needing -0
-    if (t_x < 0) 
+    if (x < 0.0l)
     {
-        t_x = xz + t_x;
         w_x -= 1;
+        t_x += (xz - 1);
     }
 
-    if (t_z < 0) 
+    if (z < 0.0l)
     {
-        t_z = xz + t_z;
         w_z -= 1;
-    }
-    //std::cout << w_x << ":" << w_z << " - " << t_x << ":" << t_z<< " ------ " << x << ":" << y << ":" << z << std::endl;
+        t_z += (xz - 1);
+    } 
+
+    std::cout << w_x << ":" << w_z << " - " << t_x << ":" << t_z<< " ------ " << x << ":" << y << ":" << z << std::endl;
     std::pair p(w_x, w_z);
     try 
     {

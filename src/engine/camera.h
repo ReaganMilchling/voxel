@@ -28,7 +28,7 @@ const float ZOOM = 90.0f;
 class Camera
 {
 public:
-    bool collisions = false;
+    bool collisions = true;
     bool fly = true;
     // camera Attributes
     glm::vec3 Position;

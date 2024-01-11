@@ -23,7 +23,7 @@ public:
 	void renderNaive(Shader& shader);
 	void update();
 	float getBlockInWorld(int w_x, int w_z, int x, int y, int z);
-	float getBlockInWorld(int x, int y, int z);
+	float getBlockInWorld(float x, float y, float z);
 private:
 	glm::vec2 m_previous_pos;
 	std::vector<Chunk*> m_chunks;
