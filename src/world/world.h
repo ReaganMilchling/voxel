@@ -2,6 +2,7 @@
 
 #include "../engine/camera.h"
 #include "../engine/shader.h"
+#include "../threadpool.h"
 #include "chunk.h"
 #include <map>
 #include <mutex>
@@ -9,11 +10,12 @@
 class World
 {
 public:
+	ThreadPool* m_pool;
 	int m_render_distance;
 	Camera* m_camera;
 	glm::vec3* m_camera_pos;
 	
-	World(Camera*, int renderDistance);
+	World(Camera*, int renderDistance, ThreadPool*);
 	~World();
 	inline int getChunkSize() { return m_loaded_chunk_map.size();};
 	inline int getViewableChunkSize() { return m_viewable_chunk_map.size();};

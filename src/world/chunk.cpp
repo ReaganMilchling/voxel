@@ -31,8 +31,7 @@ Chunk::Chunk(int32_t x, int32_t z, World* world)
     m_water_vertex_ct = 0;
     
     //gen();
-    std::thread t1(&Chunk::gen, this);
-    t1.detach();
+    world->m_pool->queueJob([this] {this->gen();});
 }
 
 Chunk::~Chunk()
@@ -161,7 +160,7 @@ void Chunk::renderNaive(Shader &shader)
 
 void Chunk::gen()
 {
-    float scale = 50.0f;
+    float scale = 75.0f;
     float persistence = 0.4f;
     float lacunarity = 1.5f;
     int octaves = 8;
@@ -193,6 +192,7 @@ void Chunk::gen()
             // this functions as a really naive splin/step function
             // maps -1,1 to -.34,2, uses 0 as level 64 for water
             noiseHeight += .41420f;
+            //noiseHeight += .73205f;
             if (noiseHeight > 0.0f) {
                 noiseHeight *= noiseHeight;
             } else {

@@ -17,6 +17,7 @@
 #include "engine/camera.h"
 #include "world/world.h"
 #include "engine/Input.h"
+#include "threadpool.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
@@ -115,7 +116,12 @@ int main()
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
 
-    World world(&camera, 5);
+    const auto processor_count = std::thread::hardware_concurrency();
+    std::cout << processor_count << std::endl;
+    
+    ThreadPool *tp = new ThreadPool();
+
+    World world(&camera, 6, tp);
     world.generate();
     //std::thread t1(&World::generate, &world);
     //std::cout << std::this_thread::get_id() << std::endl;

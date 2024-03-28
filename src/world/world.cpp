@@ -14,12 +14,13 @@
 #include "chunk.h"
 
 
-World::World(Camera* camera, int renderDistance)
+World::World(Camera* camera, int renderDistance, ThreadPool* pool)
 {
     m_render_distance = renderDistance;
     m_camera = camera;
     m_camera_pos = &camera->Position;
     m_previous_pos = glm::vec2((int)(m_camera_pos->x/xz), (int)(m_camera_pos->z/xz));
+    m_pool = pool;
 }
 
 World::~World()
@@ -65,7 +66,7 @@ void World::moveChunk(int x, int y)
     } 
     catch (std::out_of_range) 
     {
-        if (m_loaded_chunk_map.size() > 250) {return;}
+        if (m_loaded_chunk_map.size() > 500) {return;}
         Chunk *togen = new Chunk(x, y, this);
 
         m_chunks_mutex.lock();
