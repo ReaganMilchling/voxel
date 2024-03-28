@@ -12,8 +12,8 @@
 #include "chunk.h"
 #include "world.h"
 
-#include "../engine/VertexArray.h"
-#include "../engine/VertexBuffer.h"
+#include "../engine/VertexArray.hpp"
+#include "../engine/VertexBuffer.hpp"
 
 Chunk::Chunk(int32_t x, int32_t z, World* world)
 {

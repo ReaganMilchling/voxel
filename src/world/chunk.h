@@ -1,8 +1,8 @@
 #pragma once
 
 #include "../engine/shader.h"
-#include "../engine/VertexArray.h"
-#include "../engine/VertexBuffer.h"
+#include "../engine/VertexArray.hpp"
+#include "../engine/VertexBuffer.hpp"
 
 #include <mutex>
 #include <vector>

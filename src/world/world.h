@@ -2,7 +2,7 @@
 
 #include "../engine/camera.h"
 #include "../engine/shader.h"
-#include "../threadpool.h"
+#include "../threadpool.hpp"
 #include "chunk.h"
 #include <map>
 #include <mutex>
