@@ -7,6 +7,7 @@
 #include <glm/gtc/noise.hpp>
 #include <iostream>
 #include <ostream>
+#include <pthread.h>
 #include <thread>
 
 #include "chunk.h"
@@ -28,7 +29,9 @@ Chunk::Chunk(int32_t x, int32_t z, World* world)
     m_changed = true;
     m_regen_mesh = true;
     m_vertex_ct = 0;
+    m_mesh = *new std::vector<float>();
     m_water_vertex_ct = 0;
+    m_water_mesh = *new std::vector<float>();
     
     //gen();
     world->m_pool->queueJob([this] {this->gen();});
@@ -36,15 +39,6 @@ Chunk::Chunk(int32_t x, int32_t z, World* world)
 
 Chunk::~Chunk()
 {
-    /*
-    for (int x = 0; x < m_horizontal_max; ++x)
-    {
-        for (int y = 0; y < m_y_max; ++y) 
-        {
-            delete[] chunk[x][y];
-        }
-    }
-    */
 }
 
 void Chunk::update()
@@ -62,9 +56,9 @@ void Chunk::update()
         // Most code courtesy of TheCherno
         m_VB.AddBufferData(&m_mesh[0], m_mesh.size() * sizeof(float));
         VertexBufferLayout layout;
-        layout.Push<float>(3);
-        layout.Push<float>(2);
-        layout.Push<float>(1);
+        layout.Push(3);
+        layout.Push(2);
+        layout.Push(1);
         m_VA.AddBuffer(m_VB, layout);
         
         //std::cout << std::this_thread::get_id() << " :meshSize: " << m_mesh.size() << std::endl;
@@ -160,13 +154,13 @@ void Chunk::renderNaive(Shader &shader)
 
 void Chunk::gen()
 {
+    std::cout << pthread_self() << std::endl;
+    std::unique_lock<std::mutex> lock(m_chunk_mutex);
     float scale = 75.0f;
     float persistence = 0.4f;
     float lacunarity = 1.5f;
     int octaves = 8;
 
-    m_chunk_mutex.lock();
-    // ground generation
     for (int x = 0; x < m_horizontal_max; ++x)
     {
         for (int z = 0; z < m_horizontal_max; ++z)
@@ -267,7 +261,6 @@ void Chunk::gen()
         }
     }
     genMesh();
-    m_chunk_mutex.unlock();
 }
 
 void Chunk::cavegen(int x, int y_max, int z)

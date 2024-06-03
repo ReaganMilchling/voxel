@@ -9,7 +9,7 @@ class ThreadPool {
 public:
     ThreadPool()
     {
-        const uint32_t num_threads = std::thread::hardware_concurrency() - 4;
+        const uint32_t num_threads = std::thread::hardware_concurrency() - 20;
         for (uint32_t ii = 0; ii < num_threads; ++ii) {
             threads.emplace_back(std::thread(&ThreadPool::ThreadLoop, this));
         }

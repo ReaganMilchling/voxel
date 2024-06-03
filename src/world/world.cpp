@@ -8,7 +8,6 @@
 #include <iostream>
 #include <ostream>
 #include <stdexcept>
-#include <thread>
 
 #include "world.h"
 #include "chunk.h"
@@ -33,7 +32,19 @@ World::~World()
 
 void World::generate()
 {
-    update();
+    int neg_dist = m_render_distance * -1;
+    for (int i = neg_dist; i <= m_render_distance; ++i)
+    {
+        for (int j = neg_dist; j <= m_render_distance; ++j)
+        {
+            Chunk *togen = new Chunk(i, j, this);
+            std::pair p(i, j);
+            m_chunks_mutex.lock();
+            m_loaded_chunk_map[p] = togen;
+            m_viewable_chunk_map[p] = togen;
+            m_chunks_mutex.unlock();
+        }
+    }
 }
 
 void World::generatechunk(int x, int y)
@@ -101,7 +112,6 @@ void World::update()
         }        
         m_previous_pos = new_pos;
     }
-
 }
 
 float World::getBlockInWorld(int w_x, int w_z, int x, int y, int z)

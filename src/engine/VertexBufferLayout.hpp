@@ -31,7 +31,9 @@ private:
 public:
 	VertexBufferLayout()
 		: m_Stride(0) {}
-
+/**
+ * gcc doesn't like this and I don't know enough about templates to fix it
+ * upon updating to llvm17, clang uses libstdc++ not libc++ and I can't figure out how to fix that
 	template<typename T>
 	void Push(unsigned int count)
 	{
@@ -60,6 +62,13 @@ public:
 		VertexBufferElement element = { GL_UNSIGNED_BYTE, count, GL_TRUE };
 		m_Elements.push_back(element);
 		m_Stride += count * VertexBufferElement::GetSizeOfType(GL_UNSIGNED_BYTE);
+	}
+**/
+	void Push(unsigned int count)
+	{
+		VertexBufferElement element = { GL_FLOAT, count, GL_FALSE };
+		m_Elements.push_back(element);
+		m_Stride += count * VertexBufferElement::GetSizeOfType(GL_FLOAT);
 	}
 
 	inline const std::vector<VertexBufferElement> GetElements() const& { return m_Elements; }

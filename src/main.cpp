@@ -116,9 +116,6 @@ int main()
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
 
-    const auto processor_count = std::thread::hardware_concurrency();
-    std::cout << processor_count << std::endl;
-    
     ThreadPool *tp = new ThreadPool();
 
     World world(&camera, 6, tp);
@@ -193,7 +190,7 @@ int main()
 
         // MVP
         //player.getcamera
-        glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.01f, 300.0f);
+        glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.01f, 500.0f);
         glm::mat4 view = camera.GetViewMatrix();
         glm::mat4 model = glm::mat4(1.0f);
         glm::mat4 mvp = projection * view * model;

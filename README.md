@@ -3,12 +3,20 @@
 My first attempt to make a minecraft clone in c++ using openGL.
 It's more of a rendering demo than a game currently. 
 
+# Todo items
+- make game loop independent of refresh rate and add separate tick rate
+- proper physics for falling and jumping
+- shade cardinal directions differently for contrast
+- block breaking and placing
+- saving world
+
+# Build & Compilation
+
 Setup lsp:
-- XX=clang++ CC=clang cmake .. -DCMAKE_EXPORT_COMPILE_COMMANDS=1
+- cmake .. -DCMAKE_EXPORT_COMPILE_COMMANDS=1
 - Move file to root dir
 
 build & play:
 - mkdir build && cd build
-- export CC=/usr/bin/clang && export CXX=/usr/bin/clang++
-- CXX=clang++ CC=clang cmake .. && make or (cmake -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang .. && make)
+- cmake .. && make
 - ./voxel
