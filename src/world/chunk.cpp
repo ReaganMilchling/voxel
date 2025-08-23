@@ -12,6 +12,7 @@
 
 #include "chunk.h"
 #include "world.h"
+#include "../log.h"
 
 #include "../engine/VertexArray.hpp"
 #include "../engine/VertexBuffer.hpp"
@@ -33,8 +34,8 @@ Chunk::Chunk(int32_t x, int32_t z, World* world)
     m_water_vertex_ct = 0;
     m_water_mesh = *new std::vector<float>();
     
-    //gen();
-    world->m_pool->queueJob([this] {this->gen();});
+    gen();
+    //world->m_pool->queueJob([this] {this->gen();});
 }
 
 Chunk::~Chunk()
@@ -51,24 +52,23 @@ void Chunk::update()
         m_water_VB.Unbind();
 
         genMesh();
-
-        // Calls custom made opengl api
-        // Most code courtesy of TheCherno
-        m_VB.AddBufferData(&m_mesh[0], m_mesh.size() * sizeof(float));
         VertexBufferLayout layout;
-        layout.Push(3);
-        layout.Push(2);
-        layout.Push(1);
-        m_VA.AddBuffer(m_VB, layout);
+
+        if (m_mesh.size() > 0) {
+            LOGF("pid:%zu mesh size: %zu", std::this_thread::get_id(), m_mesh.size());
+            m_VB.AddBufferData(&m_mesh[0], m_mesh.size() * sizeof(float));
+            layout.Push(3);
+            layout.Push(2);
+            layout.Push(1);
+            m_VA.AddBuffer(m_VB, layout);
+        }
         
-        //std::cout << std::this_thread::get_id() << " :meshSize: " << m_mesh.size() << std::endl;
-        m_water_VB.AddBufferData(&m_water_mesh[0], m_water_mesh.size() * sizeof(float));
-        m_water_VA.AddBuffer(m_water_VB, layout);
+        if (m_water_mesh.size() > 0) {
+            LOGF("pid:%zu water mesh size: %zu", std::this_thread::get_id(), m_water_mesh.size());
+            m_water_VB.AddBufferData(&m_water_mesh[0], m_water_mesh.size() * sizeof(float));
+            m_water_VA.AddBuffer(m_water_VB, layout);
+        }
 
-        //std::cout << m_water_vertex_ct << std::endl;
-        //std::cout << m_water_mesh.size() << std::endl;
-
-        // update changed
         m_changed = false;
     }
 }
@@ -77,8 +77,7 @@ void Chunk::genMesh()
 {
     if (m_regen_mesh)
     {
-        //std::cout << "adding mesh" << std::endl;
-        // recreate mesh
+        LOG("recreating mesh");
         for (int i = 0; i < m_horizontal_max; ++i)
         {
             for (int j = 0; j < m_y_max; ++j)
@@ -108,7 +107,7 @@ void Chunk::genMesh()
             }
         }
 
-        //std::cout << std::this_thread::get_id() << " - mesh: " <<  m_vertex_ct << "-" << m_mesh.size() 
+        LOGF("pid:%zu - vtx: %d mesh: %zu", std::this_thread::get_id(), m_vertex_ct, m_mesh.size());
         //<< "\twater:" << m_water_vertex_ct << "-" << m_water_mesh.size() << std::endl;
 
         // update changed
@@ -118,7 +117,8 @@ void Chunk::genMesh()
 
 void Chunk::render(Shader &shader)
 {
-    if (m_chunk_mutex.try_lock())
+    //LOG("render");
+    //if (m_chunk_mutex.try_lock())
     {
         if (m_mesh.size() == 0) 
         {
@@ -127,8 +127,7 @@ void Chunk::render(Shader &shader)
         }
 
         update();
-        //std::cout << m_mesh.size() << std::endl;
-        //std::cout << std::this_thread::get_id() << " : " << m_vertex_ct << std::endl;
+        //LOGF("mesh size: %zu", m_mesh.size());
 
         shader.Bind();
         m_VB.Bind();
@@ -140,7 +139,7 @@ void Chunk::render(Shader &shader)
         m_water_VA.Bind();
         glDrawArrays(GL_TRIANGLES, 0, m_water_vertex_ct);
 
-        m_chunk_mutex.unlock();
+        //m_chunk_mutex.unlock();
     } 
 }
 
@@ -154,8 +153,8 @@ void Chunk::renderNaive(Shader &shader)
 
 void Chunk::gen()
 {
-    std::cout << pthread_self() << std::endl;
-    std::unique_lock<std::mutex> lock(m_chunk_mutex);
+    //std::cout << pthread_self() << std::endl;
+    //std::unique_lock<std::mutex> lock(m_chunk_mutex);
     float scale = 75.0f;
     float persistence = 0.4f;
     float lacunarity = 1.5f;
@@ -183,7 +182,7 @@ void Chunk::gen()
                 frequency *= lacunarity;
             }
 
-            // this functions as a really naive splin/step function
+            // this functions as a really naive spline/step function
             // maps -1,1 to -.34,2, uses 0 as level 64 for water
             noiseHeight += .41420f;
             //noiseHeight += .73205f;

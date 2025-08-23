@@ -19,8 +19,6 @@ public:
 	~World();
 	inline int getChunkSize() { return m_loaded_chunk_map.size();};
 	inline int getViewableChunkSize() { return m_viewable_chunk_map.size();};
-	void generate();
-	void generatechunk(int x, int y);
 	void Render(Shader& shader);
 	void renderNaive(Shader& shader);
 	void update();
@@ -33,4 +31,6 @@ private:
 	std::map<std::pair<int, int>, Chunk*> m_loaded_chunk_map; //indexed absolutely
 	std::mutex m_chunks_mutex;
 	void moveChunk(int x, int y);
+	void generate();
+	void generatechunk(int x, int y);
 };

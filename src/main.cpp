@@ -8,7 +8,6 @@
 
 #include <iostream>
 #include <string>
-#include <thread>
 
 #include "engine/shader.h"
 #include "engine/camera.h"
@@ -18,6 +17,8 @@
 #include "world/world.h"
 #include "engine/Input.h"
 #include "threadpool.hpp"
+
+#include "log.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
@@ -54,7 +55,7 @@ int main()
     GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "Voxel", NULL, NULL);
     if (window == NULL)
     {
-        std::cout << "Failed to create GLFW window" << std::endl;
+        LOG_ERROR("Failed to create GLFW window");
         glfwTerminate();
         return -1;
     }
@@ -69,7 +70,7 @@ int main()
     // ---------------------------------------
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     {
-        std::cout << "Failed to initialize GLAD" << std::endl;
+        LOG_ERROR("Failed to initialize GLAD");
         return -1;
     }
 
@@ -87,7 +88,7 @@ int main()
     Shader rgbShader("res/shaders/Basic.shader");
 
     // load, create, and Bind a texture 
-    // -------------------------
+    // ------------------------- << str
     Texture texture1("res/textures/stone.jpg");
     texture1.Bind(1);
     Texture texture2("res/textures/dirt.jpg");
@@ -118,14 +119,10 @@ int main()
 
     ThreadPool *tp = new ThreadPool();
 
-    World world(&camera, 6, tp);
-    world.generate();
-    //std::thread t1(&World::generate, &world);
-    //std::cout << std::this_thread::get_id() << std::endl;
-    //std::thread t1(&World::generatechunk, &world, 1, 0);
+    World world(&camera, 3, tp);
 
     // time step and frame time calculation variables
-    double dt = 0.01;
+    double dt = 1 / 64.0;
     double prevTime = 0.0;
     double crntTime = 0.0;
     double timeDiff;
@@ -156,17 +153,18 @@ int main()
             // Resets times and counter
             prevTime = crntTime;
             counter = 0;
+
+            // input
+            processInput(window, &world);
+            camera.update(&world);
+            // updates
+            world.update();
         }
 
         // per-frame time logic
         double currentFrame = static_cast<double>(glfwGetTime());
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
-
-        // input
-        processInput(window, &world);
-        camera.update(&world);
-        world.update();
 
         // render
         glClearColor(0.0f, 0.6f, 0.9f, 1.0f);
@@ -204,7 +202,6 @@ int main()
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
-
 
     glfwTerminate(); 
     return 0;

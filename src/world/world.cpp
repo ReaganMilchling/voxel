@@ -11,6 +11,7 @@
 
 #include "world.h"
 #include "chunk.h"
+#include "../log.h"
 
 
 World::World(Camera* camera, int renderDistance, ThreadPool* pool)
@@ -20,6 +21,12 @@ World::World(Camera* camera, int renderDistance, ThreadPool* pool)
     m_camera_pos = &camera->Position;
     m_previous_pos = glm::vec2((int)(m_camera_pos->x/xz), (int)(m_camera_pos->z/xz));
     m_pool = pool;
+
+    this->generate();
+    //std::thread t1(&World::generate, &world);
+    //std::cout << std::this_thread::get_id() << std::endl;
+    //std::thread t1(&World::generatechunk, &world, 1, 0);
+    LOG("world generated");
 }
 
 World::~World()
@@ -39,10 +46,10 @@ void World::generate()
         {
             Chunk *togen = new Chunk(i, j, this);
             std::pair p(i, j);
-            m_chunks_mutex.lock();
+            //m_chunks_mutex.lock();
             m_loaded_chunk_map[p] = togen;
             m_viewable_chunk_map[p] = togen;
-            m_chunks_mutex.unlock();
+            //m_chunks_mutex.unlock();
         }
     }
 }
@@ -57,13 +64,13 @@ void World::generatechunk(int x, int y)
 void World::Render(Shader& shader)
 {
     //std::cout << m_viewable_chunk_map.size() << std::endl;
-    m_chunks_mutex.lock();
-    for (auto const& [pos, chunk] : m_viewable_chunk_map)
+    //m_chunks_mutex.lock();
+    for (auto& [pos, chunk] : m_viewable_chunk_map)
     {
-        //std::cout << std::this_thread::get_id() << " :coords: " << pos.first << " : " << pos.second << std::endl;
+        //LOGF("coords: %d:%d", pos.first, pos.second);
         chunk->render(shader);
     }
-    m_chunks_mutex.unlock();
+    //m_chunks_mutex.unlock();
 }
 
 void World::moveChunk(int x, int y)
@@ -80,10 +87,10 @@ void World::moveChunk(int x, int y)
         if (m_loaded_chunk_map.size() > 500) {return;}
         Chunk *togen = new Chunk(x, y, this);
 
-        m_chunks_mutex.lock();
+        //m_chunks_mutex.lock();
         m_loaded_chunk_map[p] = togen;
         m_viewable_chunk_map[p] = togen;
-        m_chunks_mutex.unlock();
+        //m_chunks_mutex.unlock();
     }
 }
 

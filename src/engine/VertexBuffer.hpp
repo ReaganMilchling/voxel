@@ -2,6 +2,10 @@
 
 #include <glad/glad.h>
 #include <glm/glm.hpp>
+#include <ostream>
+#include <thread>
+
+#include "../log.h"
 
 class VertexBuffer {
 private:
@@ -20,7 +24,7 @@ public:
 
 	void AddBufferData(const void* data, unsigned int size)
 	{
-		//std::cout <<  std::this_thread::get_id() << " rendID: " << m_RenderedID << std::endl;
+		LOGF("pid:%zu - render id: %d", std::this_thread::get_id(), m_RenderedID);
 		glBindBuffer(GL_ARRAY_BUFFER, m_RenderedID);
 		glBufferData(GL_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);
 	}
