@@ -14,6 +14,7 @@ It's more of a rendering demo than a game currently.
 
 Clone recursively:
 ```git clone --recurse-submodules {url}```
+
 Or download later:
 ```git submodule update --init --recursive```
 
